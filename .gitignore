@@ -1,0 +1,15 @@
+# Ignore Visual Studio Code settings
+.vscode/
+
+# Ignore test cases and code directories
+Code/testcases/
+./Code/nasm*/
+./Code/nasm_tutorial/
+
+# Ignore specific file types
+*.txt
+*.out
+*.pdf
+
+# Ignore misc types
+*copy*
