@@ -3,7 +3,7 @@
 #include "lexerHashTable.h"
 #endif
 
-pairLexemeToken createPairLexemeToken(char* s, TOKEN tk) {
+pairLexemeToken createPairLexemeToken(char* s, token tk) {
     pairLexemeToken newPair = (pairLexemeToken) malloc(sizeof(struct pairLexemeToken));
     newPair->lexeme = s;
     newPair->val = tk;

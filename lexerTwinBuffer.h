@@ -9,8 +9,10 @@
 
 */
 
+#define BUFLEN 2048
+
 struct twinBuffer {
-    char buffer[2][4096];
+    char buffer[2][BUFLEN];
     char* lexemeBegin;
     char* forward;
     int whichBuffer; 

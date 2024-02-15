@@ -55,5 +55,5 @@ enum TOKEN {
     TK_DIV,
     TK_NOT,
     TK_AND,
-    TK_OR,
+    TK_OR
 };
