@@ -57,3 +57,5 @@ enum TOKEN {
     TK_AND,
     TK_OR
 };
+
+typedef enum TOKEN token;
