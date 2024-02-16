@@ -4,7 +4,7 @@
 #endif
 
 char nextChar(twinBuffer B) {
-    return advance(B)->forward;
+    return *(advance(B)->forward);
 }
 
 twinBuffer initBuffer(char* filename) {
