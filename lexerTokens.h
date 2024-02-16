@@ -1,4 +1,5 @@
-enum TOKEN {
+enum TOKEN
+{
     TK_COMMENT,
     TK_ASSIGNOP,
     TK_NUM,

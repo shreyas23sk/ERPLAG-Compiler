@@ -3,46 +3,62 @@
 #include "lexerTwinBuffer.h"
 #endif
 
-char nextChar(twinBuffer B) {
+char nextChar(twinBuffer B)
+{
     return *(advance(B)->forward);
 }
 
-twinBuffer initBuffer(char* filename) {
-    twinBuffer B = (twinBuffer) malloc(sizeof(struct twinBuffer));
-    
+twinBuffer initBuffer(char *filename)
+{
+    twinBuffer B = (twinBuffer)malloc(sizeof(struct twinBuffer));
+
     B->beginBufferNo = 0;
     B->begin = B->buffer[B->beginBufferNo];
-    
+
     B->forwardBufferNo = 1;
     B->forward = B->buffer[B->forwardBufferNo] + BUFLEN - 1;
-    
+
     B->fp = fopen(filename, "ab");
 
     return B;
 }
 
-twinBuffer reload(twinBuffer B) {
+twinBuffer reload(twinBuffer B)
+{
     fread(B->buffer[B->forwardBufferNo], sizeof(char), BUFLEN, B->fp);
     return B;
 }
 
-twinBuffer advance(twinBuffer B) {
-    if(B->forward == B->buffer[B->forwardBufferNo] + BUFLEN - 1) {
+twinBuffer advance(twinBuffer B)
+{
+    if (B->forward == B->buffer[B->forwardBufferNo] + BUFLEN - 1)
+    {
         B->forwardBufferNo = !B->forwardBufferNo;
         B->forward = B->buffer[B->forwardBufferNo];
-        if(!B->retractions) reload(B);
-    } else {
+
+        if (!B->retractions)
+            reload(B);
+    }
+    else
+    {
         B->forward++;
     }
-    if(B->retractions > 0) B->retractions--;
+
+    if (B->retractions > 0)
+        B->retractions--;
+
     return B;
 }
 
-twinBuffer retract(twinBuffer B) {
-    if(B->forward == B->buffer[B->forwardBufferNo]) {
+twinBuffer retract(twinBuffer B)
+{
+    if (B->forward == B->buffer[B->forwardBufferNo])
+    {
         B->forwardBufferNo = !B->forwardBufferNo;
         B->forward = B->buffer[B->forwardBufferNo] + BUFLEN - 1;
-    } else {
+    }
+    else
+    {
         B->forward = B->forward--;
     }
 
@@ -50,9 +66,11 @@ twinBuffer retract(twinBuffer B) {
     return B;
 }
 
-// advances forward beyond current lexeme and 
+// advances forward beyond current lexeme and
 // sets begin to be equal to forward
-twinBuffer resetBegin(twinBuffer B) {
+
+twinBuffer resetBegin(twinBuffer B)
+{
     B = advance(B);
     B->begin = B->forward;
     B->beginBufferNo = B->forwardBufferNo;

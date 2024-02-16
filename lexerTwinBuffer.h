@@ -13,18 +13,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-struct twinBuffer {
+struct twinBuffer
+{
     FILE *fp;
     char buffer[2][BUFLEN];
-    char* begin;
-    char* forward;
-    int forwardBufferNo, beginBufferNo; 
+    char *begin;
+    char *forward;
+    int forwardBufferNo, beginBufferNo;
     int retractions;
 };
 
-typedef struct twinBuffer* twinBuffer;
+typedef struct twinBuffer *twinBuffer;
 
-twinBuffer initBuffer(char*);
+twinBuffer initBuffer(char *);
 char nextChar(twinBuffer); // advance buffer and return char, returns eof on completion of input
 twinBuffer reload(twinBuffer);
 twinBuffer advance(twinBuffer);
