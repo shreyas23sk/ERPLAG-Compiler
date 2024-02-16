@@ -2,10 +2,6 @@
 #define LEXERHASHTABLE
 #include "lexerHashTable.h"
 #endif
-#ifndef LEXERTOKENS
-#define LEXERTOKENS
-#include "lexerTokens.h"
-#endif 
 
 pairLexemeToken createPairLexemeToken(char* s, token tk) {
     pairLexemeToken newPair = (pairLexemeToken) malloc(sizeof(struct pairLexemeToken));
