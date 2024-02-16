@@ -6,7 +6,7 @@
 
 struct pairLexemeToken {
     char* lexeme;
-    TOKEN val;
+    token val;
 };
 typedef struct pairLexemeToken* pairLexemeToken;
 

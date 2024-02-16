@@ -10,17 +10,23 @@
 */
 
 #define BUFLEN 2048
+#include <stdlib.h>
+#include <stdio.h>
 
 struct twinBuffer {
+    FILE *fp;
     char buffer[2][BUFLEN];
-    char* lexemeBegin;
+    char* begin;
     char* forward;
-    int whichBuffer; 
+    int forwardBufferNo, beginBufferNo; 
+    int retractions;
 };
 
-typedef struct twinBuffer twinBuffer;
+typedef struct twinBuffer* twinBuffer;
 
-twinBuffer initBuffer();
+twinBuffer initBuffer(char*);
 char nextChar(twinBuffer); // advance buffer and return char, returns eof on completion of input
+twinBuffer reload(twinBuffer);
 twinBuffer advance(twinBuffer);
 twinBuffer retract(twinBuffer);
+twinBuffer resetBegin(twinBuffer);
