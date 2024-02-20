@@ -9,6 +9,7 @@
 
 char*  filename;
 twinBuffer B;
+// hashmap
 
 
 pairLexemeToken acceptState(token tk, twinBuffer B) {
