@@ -56,7 +56,8 @@ enum TOKEN
     TK_DIV,
     TK_NOT,
     TK_AND,
-    TK_OR
+    TK_OR,
+    TK_PARAMETER
 };
 
 typedef enum TOKEN token;
