@@ -31,3 +31,4 @@ twinBuffer reload(twinBuffer);
 twinBuffer advance(twinBuffer);
 twinBuffer retract(twinBuffer);
 twinBuffer resetBegin(twinBuffer);
+char* getLexeme(twinBuffer);

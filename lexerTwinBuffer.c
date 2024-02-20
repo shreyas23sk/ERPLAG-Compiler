@@ -77,3 +77,7 @@ twinBuffer resetBegin(twinBuffer B)
 
     return B;
 }
+
+char* getLexeme(twinBuffer B) {
+    
+}
