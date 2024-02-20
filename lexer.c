@@ -9,61 +9,63 @@
 
 char*  filename;
 twinBuffer B;
+hashTable ht;
 
-// hashmap
-hashTable ht = createEmptyHashTable();
+void initLexer() {
+    ht = createEmptyHashTable();
 
 
 // populate the hashmap
-int k = insert(ht,pairLexemeToken("with",TK_WITH)); //with
-k = insert(ht,pairLexemeToken("parameters",TK_PARAMETERS)); // parameters
-k = insert(ht,pairLexemeToken("end",TK_END)); // end
-k = insert(ht,pairLexemeToken("while",TK_WHILE)); // while
-k = insert(ht,pairLexemeToken("union",TK_UNION)); // union
-k = insert(ht,pairLexemeToken("endunion",TK_ENDUNION)); // end union
-k = insert(ht,pairLexemeToken("definetype",TK_DEFINETYPE)); //definetype
-k = insert(ht,pairLexemeToken("as",TK_AS)); // as
-k = insert(ht,pairLexemeToken("type",TK_TYPE)); //type
-k = insert(ht,pairLexemeToken("_main",TK_MAIN)); // main
-k = insert(ht,pairLexemeToken("global",TK_GLOBAL)); //global
-k = insert(ht,pairLexemeToken("parameter",TK_PARAMETER)); //parameter
-k = insert(ht,pairLexemeToken("list",TK_LIST)); // list
-k = insert(ht,pairLexemeToken("[",TK_SQL)); // left sqr
-k = insert(ht,pairLexemeToken("]",TK_SQR)); // right sqr
-k = insert(ht,pairLexemeToken("input",TK_INPUT)); // input
-k = insert(ht,pairLexemeToken("output",TK_OUTPUT)); //  output
-k = insert(ht,pairLexemeToken("int",TK_INT)); // int
-k = insert(ht,pairLexemeToken("real",TK_REAL)); // real 
-k = insert(ht,pairLexemeToken(",",TK_COMMA)); // comma 
-k = insert(ht,pairLexemeToken(";",TK_SEM)); // semicolon
-k = insert(ht,pairLexemeToken(":",TK_COLON)); // colon 
-k = insert(ht,pairLexemeToken(".",TK_DOT)); // dot
-k = insert(ht,pairLexemeToken("endwhile",TK_ENDWHILE)); // endwhile
-k = insert(ht,pairLexemeToken("(",TK_OP)); // (
-k = insert(ht,pairLexemeToken(")",TK_CL)); // )
-k = insert(ht,pairLexemeToken("if",TK_IF)); // if
-k = insert(ht,pairLexemeToken("then",TK_THEN)); // then
-k = insert(ht,pairLexemeToken("endif",TK_ENDIF)); //endif
-k = insert(ht,pairLexemeToken("read",TK_READ));// read
-k = insert(ht,pairLexemeToken("write",TK_WRITE)); //write
-k = insert(ht,pairLexemeToken("return",TK_RETURN));// return 
-k = insert(ht,pairLexemeToken("+",TK_PLUS)); //plus
-k = insert(ht,pairLexemeToken("-",TK_MINUS)); // minus
-k = insert(ht,pairLexemeToken("*",TK_MUL)); //mul
-k = insert(ht,pairLexemeToken("/",TK_DIV)); // div
-k = insert(ht,pairLexemeToken("call",TK_CALL)); //call
-k = insert(ht,pairLexemeToken("record",TK_RECORD)); //record
-k = insert(ht,pairLexemeToken("endrecord",TK_ENDRECORD)); //endrecord
-k = insert(ht,pairLexemeToken("else",TK_ELSE)); // else
-k = insert(ht,pairLexemeToken("&&&",TK_AND)); // and
-k = insert(ht,pairLexemeToken("@@@",TK_OR)); // or
-k = insert(ht,pairLexemeToken("~",TK_NOT)); // not
-k = insert(ht,pairLexemeToken("<",TK_LT)); // less than
-k = insert(ht,pairLexemeToken("<=",TK_LE)); // less than eq to
-k = insert(ht,pairLexemeToken("==",TK_EQ)); //equal to
-k = insert(ht,pairLexemeToken(">",TK_GT)); // greater than
-k = insert(ht,pairLexemeToken(">=",TK_GE)); // greater than eq to
-k = insert(ht,pairLexemeToken("!=",TK_NE)); // not equal 
+    int k = insert(ht,createPairLexemeToken("with",TK_WITH)); //with
+    k = insert(ht,createPairLexemeToken("parameters",TK_PARAMETERS)); // parameters
+    k = insert(ht,createPairLexemeToken("end",TK_END)); // end
+    k = insert(ht,createPairLexemeToken("while",TK_WHILE)); // while
+    k = insert(ht,createPairLexemeToken("union",TK_UNION)); // union
+    k = insert(ht,createPairLexemeToken("endunion",TK_ENDUNION)); // end union
+    k = insert(ht,createPairLexemeToken("definetype",TK_DEFINETYPE)); //definetype
+    k = insert(ht,createPairLexemeToken("as",TK_AS)); // as
+    k = insert(ht,createPairLexemeToken("type",TK_TYPE)); //type
+    k = insert(ht,createPairLexemeToken("_main",TK_MAIN)); // main
+    k = insert(ht,createPairLexemeToken("global",TK_GLOBAL)); //global
+    k = insert(ht,createPairLexemeToken("parameter",TK_PARAMETER)); //parameter
+    k = insert(ht,createPairLexemeToken("list",TK_LIST)); // list
+    k = insert(ht,createPairLexemeToken("[",TK_SQL)); // left sqr
+    k = insert(ht,createPairLexemeToken("]",TK_SQR)); // right sqr
+    k = insert(ht,createPairLexemeToken("input",TK_INPUT)); // input
+    k = insert(ht,createPairLexemeToken("output",TK_OUTPUT)); //  output
+    k = insert(ht,createPairLexemeToken("int",TK_INT)); // int
+    k = insert(ht,createPairLexemeToken("real",TK_REAL)); // real 
+    k = insert(ht,createPairLexemeToken(",",TK_COMMA)); // comma 
+    k = insert(ht,createPairLexemeToken(";",TK_SEM)); // semicolon
+    k = insert(ht,createPairLexemeToken(":",TK_COLON)); // colon 
+    k = insert(ht,createPairLexemeToken(".",TK_DOT)); // dot
+    k = insert(ht,createPairLexemeToken("endwhile",TK_ENDWHILE)); // endwhile
+    k = insert(ht,createPairLexemeToken("(",TK_OP)); // (
+    k = insert(ht,createPairLexemeToken(")",TK_CL)); // )
+    k = insert(ht,createPairLexemeToken("if",TK_IF)); // if
+    k = insert(ht,createPairLexemeToken("then",TK_THEN)); // then
+    k = insert(ht,createPairLexemeToken("endif",TK_ENDIF)); //endif
+    k = insert(ht,createPairLexemeToken("read",TK_READ));// read
+    k = insert(ht,createPairLexemeToken("write",TK_WRITE)); //write
+    k = insert(ht,createPairLexemeToken("return",TK_RETURN));// return 
+    k = insert(ht,createPairLexemeToken("+",TK_PLUS)); //plus
+    k = insert(ht,createPairLexemeToken("-",TK_MINUS)); // minus
+    k = insert(ht,createPairLexemeToken("*",TK_MUL)); //mul
+    k = insert(ht,createPairLexemeToken("/",TK_DIV)); // div
+    k = insert(ht,createPairLexemeToken("call",TK_CALL)); //call
+    k = insert(ht,createPairLexemeToken("record",TK_RECORD)); //record
+    k = insert(ht,createPairLexemeToken("endrecord",TK_ENDRECORD)); //endrecord
+    k = insert(ht,createPairLexemeToken("else",TK_ELSE)); // else
+    k = insert(ht,createPairLexemeToken("&&&",TK_AND)); // and
+    k = insert(ht,createPairLexemeToken("@@@",TK_OR)); // or
+    k = insert(ht,createPairLexemeToken("~",TK_NOT)); // not
+    k = insert(ht,createPairLexemeToken("<",TK_LT)); // less than
+    k = insert(ht,createPairLexemeToken("<=",TK_LE)); // less than eq to
+    k = insert(ht,createPairLexemeToken("==",TK_EQ)); //equal to
+    k = insert(ht,createPairLexemeToken(">",TK_GT)); // greater than
+    k = insert(ht,createPairLexemeToken(">=",TK_GE)); // greater than eq to
+    k = insert(ht,createPairLexemeToken("!=",TK_NE)); // not equal 
+}
 
 pairLexemeToken acceptState(token tk, twinBuffer B) {
     return createPairLexemeToken(getLexeme(B), tk);
