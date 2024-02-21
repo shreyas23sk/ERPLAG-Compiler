@@ -7,7 +7,6 @@ Code/testcases/
 ./Code/nasm_tutorial/
 
 # Ignore specific file types
-*.txt
 *.out
 *.pdf
 

@@ -61,3 +61,5 @@ enum TOKEN
 };
 
 typedef enum TOKEN token;
+char* tokenToString(token);
+token stringToToken(char *);

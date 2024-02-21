@@ -1,0 +1,56 @@
+program otherFunctions mainFunction 
+mainFunction TK_MAIN stmts TK_END
+otherFunctions function otherFunctions | EPSILON
+function TK_FUNID input_par output_par  TK_SEM stmts TK_END
+input_par TK_INPUT TK_PARAMETER TK_LIST TK_SQL parameter_list TK_SQR
+output_par TK_OUTPUT TK_PARAMETER TK_LIST TK_SQL parameter_list TK_SQR | EPSILON
+parameter_list dataType TK_ID remaining_list 
+dataType  primitiveDatatype  |constructedDatatype 
+primitiveDatatype  TK_INT | TK_REAL
+constructedDatatype TK_RECORD TK_RUID | TK_UNION TK_RUID | TK_RUID 
+remaining_list TK_COMMA parameter_list  | EPSILON
+stmts typeDefinitions  declarations  otherStmts returnStmt 
+typeDefinitions actualOrRedefined typeDefinitions | EPSILON
+typeDefinition TK_RECORD TK_RUID fieldDefinitions  TK_ENDRECORD
+typeDefinition TK_UNION TK_RUID fieldDefinitions  TK_ENDUNION
+fieldDefinitions fieldDefinition fieldDefinition moreFields 
+fieldDefinition TK_TYPE fieldType TK_COLON TK_FIELDID TK_SEM
+fieldType primitiveDatatype | TK_RUID
+moreFields fieldDefinition moreFields  | EPSILON
+declarations declaration declarations |EPSILON
+declaration TK_TYPE dataType  TK_COLON TK_ID  global_or_not 
+global_or_not   TK_COLON TK_GLOBAL TK_SEM | TK_SEM
+otherStmts  stmt otherStmts  | EPSILON
+stmt  assignmentStmt  | iterativeStmt |conditionalStmt |ioStmt | funCallStmt 
+assignmentStmt singleOrRecId  TK_ASSIGNOP arithmeticExpression  TK_SEM
+singleOrRecId TK_ID option_single_constructed
+option_single_constructed oneExpansion moreExpansion
+oneExpansion TK_DOT TK_FIELDID 
+moreExpansion oneExpansion moreExpansion | EPSILON 
+funCallStmt outputParameters TK_CALL TK_FUNID TK_WITH TK_PARAMETERS inputParameters
+inputParameters TK_SQL idList  TK_SQR
+iterativeStmt TK_WHILE TK_OP booleanExpression TK_CL stmt otherStmts TK_ENDWHILE
+conditionalStmt TK_IF TK_OP booleanExpression TK_CL TK_THEN stmt otherStmts endOrElse
+endOrElse TK_ELSE stmt otherStmts TK_ENDIF | TK_ENDIF
+ioStmt TK_READ TK_OP var  TK_CL TK_SEM | TK_WRITE TK_OP var  TK_CL TK_SEM
+arithmeticExpression term expPrime
+expPrime lowPrecedenceOperator term expPrime | EPSILON 
+term factor termPrime
+termPrime highPrecdenceOperator factor termPrime | EPSILON
+factor TK_OP arithmeticExpression TK_CL | var
+highPrecdenceOperator TK_MUL | TK_DIV
+lowPrecedenceOperator TK_PLUS | TK_MINUS
+afterNotBooleanExpression TK_OP afterNotBooleanExpression TK_CL logicalOp TK_OP afterNotBooleanExpression TK_CL
+afterNotBooleanExpression  var  relationalOp  var 
+booleanExpression not TK_OP afterNotBooleanExpression TK_CL
+not TK_NOT | EPSILON
+var singleOrRecId | TK_NUM | TK_RNUM
+logicalOp TK_AND | TK_OR
+relationalOp TK_LT | TK_LE | TK_EQ |TK_GT | TK_GE | TK_NE
+returnStmt TK_RETURN optionalReturn  TK_SEM
+optionalReturn TK_SQL idList  TK_SQR | EPSILON
+idList  TK_ID more_ids 
+more_ids  TK_COMMA idList  | EPSILON
+definetypestmt TK_DEFINETYPE A TK_RUID TK_AS TK_RUID
+A TK_RECORD | TK_UNION
+outputParameters TK_SQL idList TK_SQR TK_ASSIGNOP | EPSILON
