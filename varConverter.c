@@ -300,7 +300,7 @@ const char* tokenToString(token t) {
             return "<unknown>";
     }
 }
-token stringToToken(const char *str) {
+token stringToToken(char *str) {
     if (!strcmp(str, "TK_COMMENT"))
         return TK_COMMENT;
     else if (!strcmp(str, "TK_ASSIGNOP"))
