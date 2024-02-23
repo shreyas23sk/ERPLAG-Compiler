@@ -126,5 +126,5 @@ token get_token_code(char *lex){
         }
         return TK_FIELDID;
     }
-    return ht->items[i]->val;
+    return ht->items[ind]->val;
 }
