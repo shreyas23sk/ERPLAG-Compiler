@@ -11,6 +11,9 @@
 // if state is in initState and current character is ch, take state to finState
 #define d(initState, ch, finState) if (state == initState && c == ch) { state = finState; continue; }
 
+// for checking if cond is satisfied (use c as char variable as defined in the function)
+#define dr(initState, cond, finState) if (state == initState && cond) { state = finState; continue; }
+
 // catchall case, to be used after all others are covered
 #define dn(initState, finState) if (state == initState) { state = finState; continue; }
 
