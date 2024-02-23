@@ -12,6 +12,7 @@ twinBuffer B;
 hashTable ht;
 
 void initLexer() {
+
     ht = createEmptyHashTable();
 
 
@@ -67,40 +68,62 @@ void initLexer() {
     k = insert(ht,createPairLexemeToken("!=",TK_NE)); // not equal 
 }
 
-pairLexemeToken acceptState(token tk, twinBuffer B) {
+pairLexemeToken acceptState(token tk, twinBuffer B)
+{
     return createPairLexemeToken(getLexeme(B), tk);
 }
 
-pairLexemeToken getNextToken() {
+pairLexemeToken getNextToken()
+{
     B = initBuffer(filename);
     int state = 0;
-    char* lex;
-    while(1) {
+    char *lex;
+    while (1)
+    {
         char c = nextChar(B);
-        switch(state){
-            case 0:
-                switch(c) {
-                    case '>': 
-                        state = 8;
-                        break;
-                }
+        switch (state)
+        {
+        case 0:
+            switch (c)
+            {
+            case '>':
+                state = 8;
                 break;
-            case 8:
-                switch(c) {
-                    case '=':
-                        state = 9;
-                        break;
-                    default:
-                        state = 10;
-                        break;
-                }
+            }
+            break;
+        case 8:
+            switch (c)
+            {
+            case '=':
+                state = 9;
                 break;
-            case 9:
-                return acceptState(TK_GE, B);
-            case 10:
-                retract(B);
-                return acceptState(TK_GT, B);
-                
+            default:
+                state = 10;
+                break;
+            }
+            break;
+        case 9:
+            return acceptState(TK_GE, B);
+        case 10:
+            retract(B);
+            return acceptState(TK_GT, B);
         }
     }
+}
+
+/// @brief gives the token corresponding to string lex 
+/// @param lex
+/// @return the token code
+token get_token_code(char *lex){
+    int ind = lookup(ht,lex);
+    if(ind == -1){
+        if(lex[0] == '_'){
+            return TK_FUNID;
+        }
+        else if(lex[0] == '#'){
+            return TK_RUID;
+        }
+        return TK_FIELDID;
+    }
+    return ht->items[i]->val;
 }
