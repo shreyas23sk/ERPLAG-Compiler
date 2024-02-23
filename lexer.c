@@ -7,6 +7,16 @@
 #include "lexerTwinBuffer.h"
 #endif
 
+// d, named according to convention for the transition function in DFAs, delta
+// if state is in initState and current character is ch, take state to finState
+#define d(initState, ch, finState) if (state == initState && c == ch) { state = finState; continue; }
+
+// catchall case, to be used after all others are covered
+#define dn(initState, finState) if (state == initState) { state = finState; continue; }
+
+// shorthand for if, for accept states
+#define case_(s) if (state == s)
+
 char*  filename;
 twinBuffer B;
 hashTable ht;
@@ -109,6 +119,24 @@ pairLexemeToken getNextToken()
             retract(B);
             return acceptState(TK_GT, B);
         }
+    }
+}
+
+pairLexemeToken getNextToken2() {
+    B = initBuffer(filename);
+    int state = 0;
+    char *lex;
+
+    while (1) {
+        char c = nextChar(B);
+
+        d(0, '>', 8);
+
+        d(8, '=', 9);
+        dn(8, 10);
+
+        case_(9) return acceptState(TK_GE, B);
+        case_(10) { retract(B); return acceptState(TK_GT, B); }
     }
 }
 
