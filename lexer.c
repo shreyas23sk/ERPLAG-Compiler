@@ -11,6 +11,7 @@ char*  filename;
 twinBuffer B;
 hashTable ht;
 
+/// @brief initialize the lexer and populate the hashmap
 void initLexer() {
 
     ht = createEmptyHashTable();
