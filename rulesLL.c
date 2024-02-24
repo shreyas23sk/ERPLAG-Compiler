@@ -1,7 +1,7 @@
-#ifndef RULESLL_H
-#define RULESLL_H
-#include "rulesLL.h"
-#endif 
+#ifndef PARSERDEF
+#define PARSERDEF
+#include "parserDef.h"
+#endif
 
 LinkedListPtr createLinkedList() {
     LinkedListPtr newList = (LinkedListPtr)malloc(sizeof(LinkedList));

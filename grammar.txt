@@ -5,7 +5,7 @@ function TK_FUNID input_par output_par  TK_SEM stmts TK_END
 input_par TK_INPUT TK_PARAMETER TK_LIST TK_SQL parameter_list TK_SQR
 output_par TK_OUTPUT TK_PARAMETER TK_LIST TK_SQL parameter_list TK_SQR | EPSILON
 parameter_list dataType TK_ID remaining_list 
-dataType  primitiveDatatype  |constructedDatatype 
+dataType  primitiveDatatype | constructedDatatype 
 primitiveDatatype  TK_INT | TK_REAL
 constructedDatatype TK_RECORD TK_RUID | TK_UNION TK_RUID | TK_RUID 
 remaining_list TK_COMMA parameter_list  | EPSILON
@@ -16,7 +16,7 @@ typeDefinition TK_UNION TK_RUID fieldDefinitions  TK_ENDUNION
 fieldDefinitions fieldDefinition fieldDefinition moreFields 
 fieldDefinition TK_TYPE fieldType TK_COLON TK_FIELDID TK_SEM
 fieldType primitiveDatatype | TK_RUID
-moreFields fieldDefinition moreFields  | EPSILON
+moreFields fieldDefinition moreFields | EPSILON
 declarations declaration declarations |EPSILON
 declaration TK_TYPE dataType  TK_COLON TK_ID  global_or_not 
 global_or_not   TK_COLON TK_GLOBAL TK_SEM | TK_SEM

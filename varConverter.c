@@ -2,9 +2,9 @@
 #define LEXERTOKENS
 #include "lexerTokens.h"
 #endif
-#ifndef PARSERNONTERM
-#define PARSERNONTERM
-#include "parserNonTerm.h"
+#ifndef PARSERDEF
+#define PARSERDEF
+#include "parserDef.h"
 #endif
 
 NT stringToNT(char *str)
