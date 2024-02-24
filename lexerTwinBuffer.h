@@ -26,9 +26,9 @@ struct twinBuffer
 typedef struct twinBuffer *twinBuffer;
 
 twinBuffer initBuffer(char *);
-char nextChar(twinBuffer); // advance buffer and return char, returns eof on completion of input
+char nextChar(twinBuffer);
 twinBuffer reload(twinBuffer);
 twinBuffer advance(twinBuffer);
 twinBuffer retract(twinBuffer);
 twinBuffer resetBegin(twinBuffer);
-char* getLexeme(twinBuffer);
+char *getLexeme(twinBuffer);

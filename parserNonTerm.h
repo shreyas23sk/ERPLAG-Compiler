@@ -1,9 +1,10 @@
 #ifndef LEXERTOKENS
 #define LEXERTOKENS
 #include "lexerTokens.h"
-#endif 
+#endif
 
-typedef enum {
+typedef enum
+{
     program,
     otherFunctions,
     mainFunction,
@@ -53,16 +54,18 @@ typedef enum {
     outputParameters
 } NT;
 
-typedef enum {
+typedef enum
+{
     TERM,
     NONTERM
 } TNT;
 
-typedef union {
+typedef union
+{
     TNT type;
     token tk;
     NT nt;
 } SYM;
 
-char* NTtoString(NT);
-NT stringToNT(char*);
+const char *NTtoString(NT);
+NT stringToNT(char *);

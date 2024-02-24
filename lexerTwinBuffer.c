@@ -78,6 +78,6 @@ twinBuffer resetBegin(twinBuffer B)
     return B;
 }
 
-char* getLexeme(twinBuffer B) {
-    
+char *getLexeme(twinBuffer B)
+{
 }
