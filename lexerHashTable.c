@@ -1,6 +1,6 @@
-#ifndef LEXERHASHTABLE
-#define LEXERHASHTABLE
-#include "lexerHashTable.h"
+#ifndef LEXERDEF
+#define LEXERDEF
+#include "lexerDef.h"
 #endif
 
 pairLexemeToken createPairLexemeToken(char *s, token tk)

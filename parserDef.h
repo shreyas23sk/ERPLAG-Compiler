@@ -1,6 +1,6 @@
-#ifndef LEXERTOKENS
-#define LEXERTOKENS
-#include "lexerTokens.h"
+#ifndef LEXERDEF
+#define LEXERDEF
+#include "lexerDef.h"
 #endif
 
 #include <stdio.h>

@@ -1,10 +1,6 @@
-#ifndef LEXERHASHTABLE
-#define LEXERHASHTABLE
-#include "lexerHashTable.h"
-#endif
-#ifndef TWINBUFFER
-#define TWINBUFFER
-#include "lexerTwinBuffer.h"
+#ifndef LEXERDEF
+#define LEXERDEF
+#include "lexerDef.h"
 #endif
 
 // d, named according to convention for the transition function in DFAs, delta

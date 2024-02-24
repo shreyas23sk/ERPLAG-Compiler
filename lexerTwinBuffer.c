@@ -1,6 +1,6 @@
-#ifndef TWINBUFFER
-#define TWINBUFFER
-#include "lexerTwinBuffer.h"
+#ifndef LEXERDEF
+#define LEXERDEF
+#include "lexerDef.h"
 #endif
 
 char nextChar(twinBuffer B)

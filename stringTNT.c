@@ -1,7 +1,3 @@
-#ifndef LEXERTOKENS
-#define LEXERTOKENS
-#include "lexerTokens.h"
-#endif
 #ifndef PARSERDEF
 #define PARSERDEF
 #include "parserDef.h"
