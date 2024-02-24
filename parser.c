@@ -29,8 +29,10 @@ void initGrammarRules() {
     memset(tnt, '\0', sizeof(tnt));
 
     grammar[0] = createLinkedList();
+    int j = 0; // index on tnt
     while(1)
     {
+        if(feof(fp)) break;
         char c = fgetc(fp);
         if(c == ' ') 
         {
@@ -92,8 +94,11 @@ void initGrammarRules() {
             gIndex++;
             grammar[gIndex] = createLinkedList();
             insertNode(grammar[gIndex], grammar[gIndex - 1]->head->data);
+        } 
+        else 
+        {
+            tnt[j++] = c;
         }
 
-        if(feof(fp)) break;
     }
 }
