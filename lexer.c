@@ -110,8 +110,18 @@ pairLexemeToken getNextToken()
         char c = nextChar(B);
 
         d(0, '>', 8);
+        d(0,'!',11);
         d(8, '=', 9);
+        d(0,'=',48);
+        d(0,'&',13);
+        d(0,'@',16);
+        dn(11,12);
         dn(8, 10);
+        dn(48,49);
+        dn(13,14);
+        dn(14,15);
+        dn(16,17);
+        dn(17,18);
 
         case_(9)
         {
@@ -122,6 +132,18 @@ pairLexemeToken getNextToken()
         {
             retract(B);
             return acceptState(TK_GT, B);
+        }
+        case_(12){
+            return acceptState(TK_NE,B);
+        }
+        case_(15){
+            return acceptState(TK_AND,B);
+        }
+        case_(18){
+            return acceptState(TK_OR,B);
+        }
+        case_(49){
+            return acceptState(TK_EQ,B);
         }
     }
 }
