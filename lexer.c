@@ -98,6 +98,16 @@ pairLexemeToken acceptState(token tk, twinBuffer B)
     return createPairLexemeToken(getLexeme(B), tk);
 }
 
+/// @brief returns true if the input is a symbol
+bool isSym(char *c)
+{
+    if (lookup(ht, c) == -1)
+    {
+        return false;
+    }
+    return true;
+}
+
 pairLexemeToken getNextToken()
 {
     B = initBuffer(filename);
@@ -115,6 +125,10 @@ pairLexemeToken getNextToken()
         d(0, '=', 48);
         d(0, '&', 13);
         d(0, '@', 16);
+        if (isSym(c))
+        {
+            d(0, c, 19);
+        }
         dn(11, 12);
         dn(8, 10);
         dn(48, 49);
@@ -144,6 +158,10 @@ pairLexemeToken getNextToken()
         case_(18)
         {
             return acceptState(TK_OR, B);
+        }
+        case_(19)
+        {
+            return acceptState(get_token_code(lex), B);
         }
         case_(49)
         {
