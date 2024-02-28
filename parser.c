@@ -20,6 +20,7 @@ LinkedListPtr* grammar;
 int nullable[NO_OF_NONTERMS];
 tokenSet firstSet[NO_OF_NONTERMS];
 tokenSet followSet[NO_OF_NONTERMS];
+int LLParseTable[NO_OF_NONTERMS][NO_OF_TERMS];
 
 tokenSet addTokenToTokenSet(tokenSet S, token tk) {
     if(S->size == 0) {
@@ -254,6 +255,20 @@ void computeFollow() {
             }
         }
     }
+    return ;
+}
+
+tokenSet computePredict(LinkedListPtr production) {
+    tokenSet temp = computeFirstList(production->head->next);
+
+    if(temp->eps == 1) 
+    {
+        temp = unionTokenSet(temp, followSet[production->head->data.nt], 1);
+    }
+
+    temp->eps = 0;
+
+    return temp;
 }
 
 void computeFirstAndFollow() {
@@ -271,24 +286,23 @@ void computeFirstAndFollow() {
         followSet[i]->size = 0;
     }
 
-    // calculate nullables
-    /* nullable[EPSILON] = 1;
+    // computeFirst 
+    computeFirst();
+
+    // computeFollow
+    computeFollow();
+    
+    // generate LLParseTable
     for(int i = 0; i < NO_OF_RULES; i++) {
+        tokenSet s = computePredict(grammar[i]);
+
         NT nt = grammar[i]->head->data.nt;
 
-        NodePtr curr = grammar[i]->head->next;
-        int isNull = 1;
-        while(curr != NULL) {
-            if(curr->data.type == TERM) {
-                isNull = 0;
-                break;
-            } else {
-                isNull = isNull & (nullable[curr->data.nt]);
-            }
+        for(int j = 0; j < s->size; j++) {
+            LLParseTable[nt][s->set[j]] = i;
         }
-        nullable[nt] = isNull;
-    } */
+    }
 
-    // computeFirst 
+
 }
 
