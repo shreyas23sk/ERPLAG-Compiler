@@ -10,6 +10,8 @@
 
 typedef struct {
     token* set;
+    int eps;
+    int endOfInput;
     int size;
 } TKSET;
 typedef TKSET* tokenSet;
@@ -17,7 +19,7 @@ typedef TKSET* tokenSet;
 LinkedListPtr* grammar;
 int nullable[NO_OF_NONTERMS];
 tokenSet firstSet[NO_OF_NONTERMS];
-tokenSet followSet[NO_OF_NONTERMS] = {NULL};
+tokenSet followSet[NO_OF_NONTERMS];
 
 tokenSet addTokenToTokenSet(tokenSet S, token tk) {
     if(S->size == 0) {
@@ -61,6 +63,13 @@ tokenSet unionTokenSet(tokenSet A, tokenSet B, int withEpsilon) {
     }
 
     A->size = totalSize;
+
+    if(withEpsilon) {
+        A->eps = (A->eps | B->eps);
+    }
+
+    A->endOfInput = (A->endOfInput | B->endOfInput);
+
     return A;
 }
 
@@ -151,8 +160,100 @@ void initGrammarRules() {
     }
 }
 
-token* first(SYM s) {
-   
+tokenSet first(SYM s) {
+    if(s.type == TERM) {
+        tokenSet st = (tokenSet) malloc(sizeof(TKSET));
+        st->set[0] = s.tk;
+        return st;
+    } else {
+        return firstSet[s.nt];
+    }
+}
+
+int isEqual(tokenSet* setOld, tokenSet* setNew) {
+    for(int i = 0; i < NO_OF_NONTERMS; i++) {
+        if(setOld[i]->size != setNew[i]->size || 
+        setOld[i]->endOfInput != setOld[i]->endOfInput ||
+        setOld[i]->eps != setOld[i]->eps)  return 0; 
+    }
+    return 1;
+}
+
+tokenSet computeFirstList(NodePtr rhs) {
+    tokenSet temp = (tokenSet) malloc(sizeof(TKSET));
+    temp->size = 0;
+    temp->endOfInput = 0;
+    temp->eps = 0;
+
+    while(rhs != NULL) 
+    {
+        if(rhs->data.type == NONTERM && firstSet[rhs->data.nt]->eps == 1) {
+            temp = unionTokenSet(temp, firstSet[rhs->data.nt], 0);
+            rhs = rhs->next;
+        } else if(rhs->data.type == TERM) {
+            temp = unionTokenSet(temp, first(rhs->data), 1);
+            break;
+        } else {
+            temp = unionTokenSet(temp, firstSet[rhs->data.nt], 0);
+            break;
+        }
+    } 
+
+    return temp;
+}
+
+void deepCopy(tokenSet* A, tokenSet* B) {
+    for(int i = 0; i < NO_OF_NONTERMS; i++) {
+        A[i]->set = (token *) malloc(sizeof(token) * B[i]->size);
+        for(int j = 0; j < B[i]->size; j++) {
+            A[i]->set[j] = B[i]->set[j];
+        }
+        A[i]->endOfInput = B[i]->endOfInput;
+        A[i]->eps = B[i]->eps;
+        A[i]->size = B[i]->size;
+    }
+}
+
+void computeFirst() {
+    tokenSet firstSetOld[NO_OF_NONTERMS];
+
+    while(!isEqual(firstSetOld, firstSet)) 
+    {
+        deepCopy(firstSetOld, firstSet);
+        for(int i = 0; i < NO_OF_RULES; i++) 
+        {
+            LinkedListPtr pi = grammar[i];
+            firstSet[pi->head->data.nt] = unionTokenSet(firstSet[pi->head->data.nt], computerFirstList(pi->head->next), 1);
+        }
+    }
+}
+
+void computeFollow() {
+    tokenSet followSetOld[NO_OF_NONTERMS];
+    
+    while(!isEqual(followSetOld, followSet)) 
+    {
+        for(int i = 0; i < NO_OF_RULES; i++) 
+        {
+            NodePtr rhs = grammar[i]->head->next;
+
+            while(rhs != NULL) 
+            {
+                SYM data = rhs->data;
+                tokenSet firstOfRemainingList = computeFirstList(rhs->next);
+                
+                if(data.type == NONTERM) 
+                {
+                    followSet[data.nt] = unionTokenSet(followSet[data.nt], firstOfRemainingList, 0);
+                }
+                
+                if(firstOfRemainingList->eps == 1) 
+                {
+                    followSet[data.nt] = unionTokenSet(followSet[data.nt], followSet[grammar[i]->head->data.nt], 1);
+                }
+            }
+        }
+    }
 }
 
 void computeFirstAndFollow() {
@@ -160,14 +261,18 @@ void computeFirstAndFollow() {
     // initialise first and follow set
     for(int i = 0; i < NO_OF_NONTERMS; i++) {
         firstSet[i] = (tokenSet) malloc(sizeof(TKSET));
+        firstSet[i]->eps = (i == EPSILON);
+        firstSet[i]->endOfInput = 0;
         firstSet[i]->size = 0;
 
         followSet[i] = (tokenSet) malloc(sizeof(TKSET));
+        followSet[i]->eps = 0;
+        followSet[i]->endOfInput = (i == program);
         followSet[i]->size = 0;
     }
 
     // calculate nullables
-    nullable[EPSILON] = 1;
+    /* nullable[EPSILON] = 1;
     for(int i = 0; i < NO_OF_RULES; i++) {
         NT nt = grammar[i]->head->data.nt;
 
@@ -182,6 +287,8 @@ void computeFirstAndFollow() {
             }
         }
         nullable[nt] = isNull;
-    }
+    } */
+
+    // computeFirst 
 }
 
