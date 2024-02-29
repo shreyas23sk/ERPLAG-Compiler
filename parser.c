@@ -17,7 +17,6 @@ typedef struct {
 typedef TKSET* tokenSet;
 
 LinkedListPtr* grammar;
-int nullable[NO_OF_NONTERMS];
 tokenSet firstSet[NO_OF_NONTERMS];
 tokenSet followSet[NO_OF_NONTERMS];
 int LLParseTable[NO_OF_NONTERMS][NO_OF_TERMS];
@@ -98,9 +97,6 @@ void addSymToGrammar(char* tnt, LinkedListPtr* grammar, int gIndex) {
     printf("%s ", tnt);
     insertNode(grammar[gIndex], data);
 
-    if(grammar[gIndex]->head != NULL && data.type == NONTERM && data.nt == EPSILON) {
-        nullable[grammar[gIndex]->head->data.nt] = 1;
-    }
 }
 
 // @brief initializes the grammar rules by reading grammar.txt
