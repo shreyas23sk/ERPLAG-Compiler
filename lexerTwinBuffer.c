@@ -82,4 +82,45 @@ twinBuffer resetBegin(twinBuffer B)
 
 char *getLexeme(twinBuffer B)
 {
+    int lexLength = 0;
+    if(B->beginBufferNo == B->forwardBufferNo) 
+    {
+        lexLength = B->forward - B->begin;
+        char* lexeme = (char *) malloc(sizeof(char) * (lexLength + 1));
+
+        int i = 0;
+        while(i < lexLength) {
+            lexeme[i] = B->begin + i;
+            i++;
+        }
+
+        lexeme[lexLength] = '/0';
+
+        return lexeme;
+    } 
+    else 
+    {
+        int lexLength1 = B->buffer[B->beginBufferNo] + BUFLEN - 1 - B->begin;
+        int lexLength2 = B->forward - B->buffer[B->forwardBufferNo];
+
+        char* lexeme = (char *) malloc(sizeof(char) * (lexLength1 + lexLength2 + 1));
+
+        int i = 0, j = 0;
+
+        while(i < lexLength1) 
+        {
+            lexeme[i] = B->begin + i;
+            i++;
+        }
+
+        while(j < lexLength2)
+        {
+            lexeme[lexLength1 + j] = B->buffer[B->forwardBufferNo] + j;
+            j++;
+        } 
+
+        lexeme[lexLength1 + lexLength2] = '/0';
+        
+        return lexeme;
+    }
 }
