@@ -18,6 +18,8 @@ twinBuffer initBuffer(char *filename)
     B->forwardBufferNo = 1;
     B->forward = B->buffer[B->forwardBufferNo] + BUFLEN - 1;
 
+    B->lineNo = 1;
+
     B->fp = fopen(filename, "ab");
 
     return B;
