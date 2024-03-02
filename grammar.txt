@@ -1,16 +1,17 @@
 program otherFunctions mainFunction 
 mainFunction TK_MAIN stmts TK_END
 otherFunctions function otherFunctions | EPSILON
-function TK_FUNID input_par output_par  TK_SEM stmts TK_END
-input_par TK_INPUT TK_PARAMETER TK_LIST TK_SQL parameter_list TK_SQR
+function TK_FUNID input_par output_par  TK_SEM stmts TK_END 
+input_par TK_INPUT TK_PARAMETER TK_LIST TK_SQL parameter_list TK_SQR 
 output_par TK_OUTPUT TK_PARAMETER TK_LIST TK_SQL parameter_list TK_SQR | EPSILON
 parameter_list dataType TK_ID remaining_list 
 dataType  primitiveDatatype | constructedDatatype 
-primitiveDatatype  TK_INT | TK_REAL
+primitiveDatatype  TK_INT | TK_REAL 
 constructedDatatype TK_RECORD TK_RUID | TK_UNION TK_RUID | TK_RUID 
 remaining_list TK_COMMA parameter_list  | EPSILON
 stmts typeDefinitions  declarations  otherStmts returnStmt 
 typeDefinitions actualOrRedefined typeDefinitions | EPSILON
+actualOrRedefined typeDefinition | definetypestmt
 typeDefinition TK_RECORD TK_RUID fieldDefinitions  TK_ENDRECORD
 typeDefinition TK_UNION TK_RUID fieldDefinitions  TK_ENDUNION
 fieldDefinitions fieldDefinition fieldDefinition moreFields 

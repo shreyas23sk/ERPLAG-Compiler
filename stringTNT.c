@@ -9,6 +9,30 @@ NT stringToNT(char *str)
     {
         return program;
     }
+    else if (strcmp(str, "fieldType") == 0) 
+    {
+        return fieldType;
+    }
+    else if (strcmp(str, "inputParameters") == 0) 
+    {
+        return inputParameters;
+    }
+    else if (strcmp(str, "endOrElse") == 0) 
+    {
+        return endOrElse;
+    }
+    else if (strcmp(str, "assignmentStmt") == 0) 
+    {
+        return assignmentStmt;
+    }
+    else if (strcmp(str, "highPrecdenceOperator") == 0)
+    {
+        return highPrecedenceOperator;
+    }
+    else if (strcmp(str, "lowPrecedenceOperator") == 0)
+    {
+        return lowPrecedenceOperator;
+    }
     else if (strcmp(str, "otherFunctions") == 0)
     {
         return otherFunctions;
@@ -16,6 +40,22 @@ NT stringToNT(char *str)
     else if (strcmp(str, "mainFunction") == 0)
     {
         return mainFunction;
+    }
+    else if (strcmp(str, "actualOrRedefined") == 0) 
+    {
+        return actualOrRedefined;
+    }
+    else if (strcmp(str, "arithmeticExpression") == 0)
+    {
+        return arithmeticExpression;
+    }
+    else if (strcmp(str, "parameter_list") == 0) 
+    {
+        return parameter_list;
+    }
+    else if (strcmp(str, "function") == 0)
+    {
+        return function;
     }
     else if (strcmp(str, "EPSILON") == 0)
     {
@@ -208,8 +248,28 @@ const char *NTtoString(NT nt)
         return "program";
     case otherFunctions:
         return "otherFunctions";
+    case fieldType:
+        return "fieldType";
+    case arithmeticExpression:
+        return "arithmeticExpression";
+    case parameter_list:
+        return "parameter_list";
     case mainFunction:
         return "mainFunction";
+    case actualOrRedefined:
+        return "actualOrRedefined";
+    case function:
+        return "function";
+    case highPrecedenceOperator:
+        return "highPrecdenceOperator";
+    case lowPrecedenceOperator:
+        return "lowPrecedenceOperator";
+    case assignmentStmt:
+        return "assignmentStmt";
+    case inputParameters:
+        return "inputParameters";
+    case endOrElse:
+        return "endOrElse";
     case EPSILON:
         return "EPSILON";
     case input_par:
@@ -246,8 +306,6 @@ const char *NTtoString(NT nt)
         return "otherStmts";
     case stmt:
         return "stmt";
-    case assignmentStmt:
-        return "assignmentStmt";
     case iterativeStmt:
         return "iterativeStmt";
     case conditionalStmt:
@@ -316,6 +374,20 @@ const char *tokenToString(token t)
         return "TK_NUM";
     case TK_RNUM:
         return "TK_RNUM";
+    case TK_MUL:
+        return "TK_MUL";
+    case TK_DIV:
+        return "TK_DIV";
+    case TK_PLUS:
+        return "TK_PLUS";
+    case TK_MINUS:
+        return "TK_MINUS";
+    case TK_COMMA:
+        return "TK_COMMA";
+    case TK_DOT:
+        return "TK_DOT";
+    case TK_NOT:
+        return "TK_NOT";
     case TK_ID:
         return "TK_ID";
     case TK_FIELDID:
@@ -362,6 +434,16 @@ const char *tokenToString(token t)
         return "TK_LIST";
     case TK_INPUT:
         return "TK_INPUT";
+    case TK_AND:
+        return "TK_AND";
+    case TK_COLON:
+        return "TK_COLON";
+    case TK_OR:
+        return "TK_OR";
+    case TK_CL:
+        return "TK_CL";
+    case TK_OP:
+        return "TK_OP";
     case TK_OUTPUT:
         return "TK_OUTPUT";
     case TK_INT:
@@ -392,6 +474,12 @@ const char *tokenToString(token t)
         return "TK_ELSE";
     case TK_SQL:
         return "TK_SQL";
+    case TK_SEM:
+        return "TK_SEM";
+    case TK_PARAMETER:
+        return "TK_PARAMETER";
+    case TK_SQR:
+        return "TK_SQR";
     default:
         return "<unknown>";
     }
@@ -402,6 +490,18 @@ token stringToToken(char *str)
         return TK_COMMENT;
     else if (!strcmp(str, "TK_ASSIGNOP"))
         return TK_ASSIGNOP;
+    else if (!strcmp(str, "TK_UNION"))
+        return TK_UNION;
+    else if (!strcmp(str, "TK_ENDUNION"))
+        return TK_ENDUNION;
+    else if (!strcmp(str, "TK_TYPE"))
+        return TK_TYPE;
+    else if (!strcmp(str, "TK_GLOBAL"))
+        return TK_GLOBAL;
+    else if (!strcmp(str, "TK_DEFINETYPE"))
+        return TK_DEFINETYPE;
+    else if (!strcmp(str, "TK_AS"))
+        return TK_AS;
     else if (!strcmp(str, "TK_NUM"))
         return TK_NUM;
     else if (!strcmp(str, "TK_RNUM"))
@@ -414,6 +514,12 @@ token stringToToken(char *str)
         return TK_FUNID;
     else if (!strcmp(str, "TK_RUID"))
         return TK_RUID;
+    else if (!strcmp(str, "TK_INPUT"))
+        return TK_INPUT;
+    else if (!strcmp(str, "TK_LIST"))
+        return TK_LIST;
+    else if (!strcmp(str, "TK_OUTPUT"))
+        return TK_OUTPUT;
     else if (!strcmp(str, "TK_GT"))
         return TK_GT;
     else if (!strcmp(str, "TK_GE"))
@@ -432,6 +538,10 @@ token stringToToken(char *str)
         return TK_WITH;
     else if (!strcmp(str, "TK_END"))
         return TK_END;
+    else if (!strcmp(str, "TK_INT"))
+        return TK_INT;
+    else if (!strcmp(str, "TK_REAL"))
+        return TK_REAL;
     else if (!strcmp(str, "TK_WHILE"))
         return TK_WHILE;
     else if (!strcmp(str, "TK_ENDWHILE"))
@@ -488,5 +598,7 @@ token stringToToken(char *str)
         return TK_OR;
     else if (!strcmp(str, "TK_PARAMETER"))
         return TK_PARAMETER;
+    else if (!strcmp(str, "TK_MAIN"))
+        return TK_MAIN;
     exit(-1);
 }

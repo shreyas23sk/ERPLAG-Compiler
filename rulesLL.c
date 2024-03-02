@@ -32,6 +32,17 @@ void insertNode(LinkedListPtr list, SYM newData) {
     list->tail = newNode;
 }
 
+void printList(LinkedListPtr list) {
+    NodePtr curr = list->head;
+    while(curr != NULL) {
+        if(curr->data.type == TERM) printf("%s ", tokenToString(curr->data.tk));
+        else printf("%s ", NTtoString(curr->data.nt));
+
+        curr = curr->next;
+    }
+    printf("\n");
+}
+
 StackPtr createStack() {
     StackPtr newStack = (StackPtr)malloc(sizeof(Stack));
     newStack->ll = createLinkedList();

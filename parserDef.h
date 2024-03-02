@@ -12,6 +12,7 @@ typedef enum
     program,
     otherFunctions,
     mainFunction,
+    function,
     EPSILON,
     input_par,
     output_par,
@@ -24,6 +25,7 @@ typedef enum
     typeDefinition,
     fieldDefinitions,
     fieldDefinition,
+    fieldType,
     moreFields,
     declarations,
     declaration,
@@ -31,6 +33,7 @@ typedef enum
     otherStmts,
     stmt,
     assignmentStmt,
+    arithmeticExpression,
     iterativeStmt,
     conditionalStmt,
     ioStmt,
@@ -38,6 +41,8 @@ typedef enum
     option_single_constructed,
     oneExpansion,
     moreExpansion,
+    inputParameters,
+    endOrElse,
     term,
     expPrime,
     factor,
@@ -55,7 +60,11 @@ typedef enum
     more_ids,
     definetypestmt,
     A,
-    outputParameters
+    outputParameters,
+    parameter_list,
+    actualOrRedefined,
+    highPrecedenceOperator,
+    lowPrecedenceOperator
 } NT;
 
 typedef enum
@@ -112,7 +121,7 @@ typedef ParseTree* ParseTreePtr;
 LinkedListPtr createLinkedList();
 NodePtr createNode(SYM newData);
 void insertNode(LinkedListPtr list, SYM newData);
-void deleteNode(LinkedListPtr list, SYM dataToDelete);
+void printList(LinkedListPtr ptr);
 
 StackPtr createStack();
 void push(StackPtr stack, SYM newData);

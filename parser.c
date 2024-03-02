@@ -3,10 +3,10 @@
 #include "parserDef.h"
 #endif
 
-#define NO_OF_RULES 94
+#define NO_OF_RULES 96
 #define MAX_SIZE_OF_TNT 26
-#define NO_OF_TERMS 58 
-#define NO_OF_NONTERMS 47
+#define NO_OF_TERMS 57 
+#define NO_OF_NONTERMS 56
 
 typedef struct {
     token* set;
@@ -19,7 +19,14 @@ typedef TKSET* tokenSet;
 LinkedListPtr* grammar;
 tokenSet firstSet[NO_OF_NONTERMS];
 tokenSet followSet[NO_OF_NONTERMS];
-int LLParseTable[NO_OF_NONTERMS][NO_OF_TERMS];
+int LLParseTable[NO_OF_NONTERMS][NO_OF_TERMS] = {{-1}};
+
+void printTokenSet(tokenSet ts) {
+    for(int i = 0; i < ts->size; i++) {
+        printf("%s ", tokenToString(ts->set[i]));
+    }
+    printf("\n");
+}
 
 tokenSet addTokenToTokenSet(tokenSet S, token tk) {
     if(S->size == 0) {
@@ -46,23 +53,27 @@ tokenSet unionTokenSet(tokenSet A, tokenSet B, int withEpsilon) {
     for(int i = 0; i < B->size; i++) {
         inSetB[B->set[i]] = 1;
     }
-
     int noOfTokensToBeAddedToA = 0;
     for(int i = 0; i < NO_OF_TERMS; i++) {
         noOfTokensToBeAddedToA += (~inSetA[i] & inSetB[i]);
     }
 
     int totalSize = A->size + noOfTokensToBeAddedToA;
-    A->set = (token *) realloc(A->set, totalSize);
-    
-    int j = 0;
-    for(int i = TK_COMMENT; i <= TK_PARAMETER; i++) {
-        if(~inSetA[i] & inSetB[i]) {
-            A->set[A->size + (j++)] = i;  
-        }
-    }
 
-    A->size = totalSize;
+    if(noOfTokensToBeAddedToA > 0) {
+            
+        if(A->size != 0) A->set = (token *) realloc(A->set, totalSize);
+        else A->set = (token *) malloc(sizeof(token) * totalSize);
+        
+        int j = 0;
+        for(int i = 0; i < NO_OF_TERMS; i++) {
+            if(~inSetA[i] & inSetB[i]) {
+                A->set[A->size + (j++)] = i;  
+            }
+        }
+
+        A->size = totalSize;
+    }
 
     if(withEpsilon) {
         A->eps = (A->eps | B->eps);
@@ -82,6 +93,7 @@ SYM createSYM(TNT type, char* str)
     } else {
         data.nt = stringToNT(str);
     }
+    return data;
 }
 
 void addSymToGrammar(char* tnt, LinkedListPtr* grammar, int gIndex) {
@@ -94,7 +106,6 @@ void addSymToGrammar(char* tnt, LinkedListPtr* grammar, int gIndex) {
     {
         data = createSYM(NONTERM, tnt);
     }
-    printf("%s ", tnt);
     insertNode(grammar[gIndex], data);
 
 }
@@ -104,7 +115,7 @@ void initGrammarRules() {
     grammar = (LinkedListPtr *) malloc(sizeof(LinkedListPtr) * NO_OF_RULES);
     int gIndex = 0;
 
-    FILE* fp = fopen("grammar.txt", "ab");
+    FILE* fp = fopen("grammar.txt", "r");
 
     char tnt[MAX_SIZE_OF_TNT];
     memset(tnt, '\0', sizeof(tnt));
@@ -112,8 +123,8 @@ void initGrammarRules() {
     grammar[0] = createLinkedList();
     int j = 0; // index on tnt
     while(1)
-    {
-        if(feof(fp)) break;
+    {   
+        
         char c = fgetc(fp);
         if(c == ' ') 
         {
@@ -124,7 +135,7 @@ void initGrammarRules() {
                 j = 0;
             }
         }
-        else if (c == '\n') 
+        else if (c == '\r') 
         {
             if(tnt[0] != '\0') // current string is not empty
             {
@@ -151,16 +162,25 @@ void initGrammarRules() {
         } 
         else 
         {
-            tnt[j++] = c;
+            if(c != '\n') tnt[j++] = c;
         }
 
+        if(feof(fp)) {
+            break;
+        }
     }
+
+    printf("Grammar successfully loaded.\n");
 }
 
 tokenSet first(SYM s) {
     if(s.type == TERM) {
         tokenSet st = (tokenSet) malloc(sizeof(TKSET));
+        st->set = (token *) malloc(sizeof(token));
         st->set[0] = s.tk;
+        st->size = 1;
+        st->endOfInput = 0;
+        st->eps = 0;
         return st;
     } else {
         return firstSet[s.nt];
@@ -214,8 +234,18 @@ void deepCopy(tokenSet* A, tokenSet* B) {
 void computeFirst() {
     tokenSet firstSetOld[NO_OF_NONTERMS];
 
-    while(!isEqual(firstSetOld, firstSet)) 
+    for(int i = 0; i < NO_OF_NONTERMS; i++) {
+        firstSetOld[i] = (tokenSet) malloc(sizeof(TKSET));
+        firstSetOld[i]->eps = (i == EPSILON);
+        firstSetOld[i]->endOfInput = 0;
+        firstSetOld[i]->size = 0;
+    }
+
+    int j = 0;
+
+    while(j == 0 || !isEqual(firstSetOld, firstSet)) 
     {
+        j = 1;
         deepCopy(firstSetOld, firstSet);
         for(int i = 0; i < NO_OF_RULES; i++) 
         {
@@ -223,13 +253,21 @@ void computeFirst() {
             firstSet[pi->head->data.nt] = unionTokenSet(firstSet[pi->head->data.nt], computeFirstList(pi->head->next), 1);
         }
     }
+    /*
+    for(int i = 0; i < NO_OF_NONTERMS; i++) {
+        printf("%s :- ", NTtoString(i));
+        printTokenSet(firstSet[i]);
+    } */
 }
 
 void computeFollow() {
     tokenSet followSetOld[NO_OF_NONTERMS];
     
-    while(!isEqual(followSetOld, followSet)) 
+    int j = 0;
+    while(j == 0 || !isEqual(followSetOld, followSet)) 
     {
+        j++;
+        deepCopy(followSetOld, followSet);
         for(int i = 0; i < NO_OF_RULES; i++) 
         {
             NodePtr rhs = grammar[i]->head->next;
@@ -238,16 +276,19 @@ void computeFollow() {
             {
                 SYM data = rhs->data;
                 tokenSet firstOfRemainingList = computeFirstList(rhs->next);
-                
+
                 if(data.type == NONTERM) 
                 {
                     followSet[data.nt] = unionTokenSet(followSet[data.nt], firstOfRemainingList, 0);
+                   
                 }
                 
                 if(firstOfRemainingList->eps == 1) 
                 {
                     followSet[data.nt] = unionTokenSet(followSet[data.nt], followSet[grammar[i]->head->data.nt], 1);
                 }
+
+                rhs = rhs->next;
             }
         }
     }
@@ -284,10 +325,17 @@ void computeFirstAndFollow() {
 
     // computeFirst 
     computeFirst();
-
-    // computeFollow
     computeFollow();
+    printf("Computed First and Follow Set\n");
+
+    int isLL1 = 1;
     
+    for(int i = 0; i < NO_OF_NONTERMS; i++) {
+        for(int j = 0; j < NO_OF_TERMS; j++) {
+            LLParseTable[i][j] = -1;
+        }
+    }
+
     // generate LLParseTable
     for(int i = 0; i < NO_OF_RULES; i++) {
         tokenSet s = computePredict(grammar[i]);
@@ -295,10 +343,24 @@ void computeFirstAndFollow() {
         NT nt = grammar[i]->head->data.nt;
 
         for(int j = 0; j < s->size; j++) {
+            if(LLParseTable[nt][s->set[j]] != -1) {
+                printf("%s %s %d\n", NTtoString(nt), tokenToString(s->set[j]), LLParseTable[nt][s->set[j]]);
+            }
             LLParseTable[nt][s->set[j]] = i;
         }
     }
 
+    printf("%d\n", isLL1);
+}
 
+int main() {
+    initGrammarRules();
+    /*
+    for(int i = 0; i < NO_OF_RULES; i++) {
+        printf("%d :- ", i);
+        printList(grammar[i]);
+    } */ 
+
+    computeFirstAndFollow();
 }
 
