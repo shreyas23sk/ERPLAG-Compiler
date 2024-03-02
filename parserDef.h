@@ -77,20 +77,46 @@ NT stringToNT(char *);
 typedef struct Node {
     SYM data;
     struct Node* next;
+    struct Node* prev;
 } Node;
 
 typedef struct {
     Node* head;
+    Node* tail;
 } LinkedList;
+
+typedef struct {
+    LinkedListPtr ll;
+} Stack;
+
+typedef struct {
+    ParseNodePtr root;
+} ParseTree;
+
+typedef struct {
+    SYM val;
+    ParseNodePtr* children;
+    int noOfChildren;
+} ParseNode;
 
 typedef Node* NodePtr;
 typedef LinkedList* LinkedListPtr;
+typedef Stack* StackPtr;
+typedef ParseNode* ParseNodePtr;
+typedef ParseTree* ParseTreePtr;
 
 LinkedListPtr createLinkedList();
 NodePtr createNode(SYM newData);
 void insertNode(LinkedListPtr list, SYM newData);
+void deleteNode(LinkedListPtr list, SYM dataToDelete);
 
-// unnecessary as of now
+StackPtr createStack();
+void push(StackPtr stack, SYM newData);
+SYM pop(StackPtr stack);
+SYM peek(StackPtr stack);
+int isStackEmpty(StackPtr stack);
 
-// void deleteNode(LinkedListPtr list, SYM dataToDelete);
-// void displayList(LinkedList list);
+ParseTreePtr createParseTree();
+ParseNodePtr createParseNode(SYM value);
+void addChild(ParseNodePtr parent, SYM value);
+void printParseTree(ParseTreePtr tree);
