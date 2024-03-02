@@ -9,6 +9,7 @@ Code/testcases/
 # Ignore specific file types
 *.out
 *.pdf
+*.o
 
 # Ignore misc types
 *copy*

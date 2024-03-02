@@ -90,11 +90,11 @@ char *getLexeme(twinBuffer B)
 
         int i = 0;
         while(i < lexLength) {
-            lexeme[i] = B->begin + i;
+            lexeme[i] = *(B->begin + i);
             i++;
         }
 
-        lexeme[lexLength] = '/0';
+        lexeme[lexLength] = '\0';
 
         return lexeme;
     } 
@@ -109,17 +109,17 @@ char *getLexeme(twinBuffer B)
 
         while(i < lexLength1) 
         {
-            lexeme[i] = B->begin + i;
+            lexeme[i] = *(B->begin + i);
             i++;
         }
 
         while(j < lexLength2)
         {
-            lexeme[lexLength1 + j] = B->buffer[B->forwardBufferNo] + j;
+            lexeme[lexLength1 + j] = *(B->buffer[B->forwardBufferNo] + j);
             j++;
         } 
 
-        lexeme[lexLength1 + lexLength2] = '/0';
+        lexeme[lexLength1 + lexLength2] = '\0';
         
         return lexeme;
     }

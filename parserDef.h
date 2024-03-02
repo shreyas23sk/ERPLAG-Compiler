@@ -3,6 +3,7 @@
 #include "lexerDef.h"
 #endif
 
+#include "string.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -73,7 +74,7 @@ typedef struct
 const char *NTtoString(NT);
 NT stringToNT(char *);
 
-
+// Linked List
 typedef struct Node {
     SYM data;
     struct Node* next;
@@ -85,23 +86,26 @@ typedef struct {
     Node* tail;
 } LinkedList;
 
+typedef Node* NodePtr;
+typedef LinkedList* LinkedListPtr;
+
+// Stack
 typedef struct {
     LinkedListPtr ll;
 } Stack;
+typedef Stack* StackPtr;
 
-typedef struct {
-    ParseNodePtr root;
-} ParseTree;
-
-typedef struct {
+// Parse Tree
+typedef struct ParseNode {
     SYM val;
-    ParseNodePtr* children;
+    struct ParseNode** children;
     int noOfChildren;
 } ParseNode;
 
-typedef Node* NodePtr;
-typedef LinkedList* LinkedListPtr;
-typedef Stack* StackPtr;
+typedef struct ParseTree {
+    struct ParseNode* root;
+} ParseTree;
+
 typedef ParseNode* ParseNodePtr;
 typedef ParseTree* ParseTreePtr;
 

@@ -220,7 +220,7 @@ void computeFirst() {
         for(int i = 0; i < NO_OF_RULES; i++) 
         {
             LinkedListPtr pi = grammar[i];
-            firstSet[pi->head->data.nt] = unionTokenSet(firstSet[pi->head->data.nt], computerFirstList(pi->head->next), 1);
+            firstSet[pi->head->data.nt] = unionTokenSet(firstSet[pi->head->data.nt], computeFirstList(pi->head->next), 1);
         }
     }
 }

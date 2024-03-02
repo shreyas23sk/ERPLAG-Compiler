@@ -93,14 +93,40 @@ void initLexer()
     k = insert(ht, createPairLexemeToken("!=", TK_NE));                 // not equal
 }
 
+
+/// @brief gives the token corresponding to string lex
+/// @param lex
+/// @return the token code
+token get_token_code(char *lex)
+{
+    int ind = lookup(ht, lex);
+    if (ind == -1)
+    {
+        if (lex[0] == '_')
+        {
+            return TK_FUNID;
+        }
+        else if (lex[0] == '#')
+        {
+            return TK_RUID;
+        }
+        return TK_FIELDID;
+    }
+    return ht->items[ind]->val;
+}
+
+
 tokenInfo acceptState(token tk, twinBuffer B)
 {
     return createTokenInfo(createPairLexemeToken(getLexeme(B), tk), B);
 }
 
 /// @brief returns true if the input is a symbol
-int isSym(char *c)
+int isSym(char c)
 {
+    char cptr[1];
+    cptr[0] = c;
+
     if (lookup(ht, c) == -1)
     {
         return 0;
@@ -168,25 +194,4 @@ tokenInfo getNextToken()
             return acceptState(TK_EQ, B);
         }
     }
-}
-
-/// @brief gives the token corresponding to string lex
-/// @param lex
-/// @return the token code
-token get_token_code(char *lex)
-{
-    int ind = lookup(ht, lex);
-    if (ind == -1)
-    {
-        if (lex[0] == '_')
-        {
-            return TK_FUNID;
-        }
-        else if (lex[0] == '#')
-        {
-            return TK_RUID;
-        }
-        return TK_FIELDID;
-    }
-    return ht->items[ind]->val;
 }

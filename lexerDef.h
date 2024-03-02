@@ -21,7 +21,6 @@ enum TOKEN
     TK_WITH,
     TK_END,
     TK_WHILE,
-    TK_END,
     TK_UNION,
     TK_ENDUNION,
     TK_DEFINETYPE,
@@ -64,8 +63,22 @@ enum TOKEN
 };
 
 typedef enum TOKEN token;
-char *tokenToString(token);
+const char *tokenToString(token);
 token stringToToken(char *);
+
+
+struct twinBuffer
+{
+    FILE *fp;
+    char buffer[2][BUFLEN];
+    char *begin;
+    char *forward;
+    int forwardBufferNo, beginBufferNo;
+    int retractions;
+    int lineNo;
+};
+
+typedef struct twinBuffer *twinBuffer;
 
 
 struct pairLexemeToken
@@ -98,18 +111,6 @@ hashTable createEmptyHashTable();
 int lookup(hashTable, char *);          // return -1 if string s not found, else return index of entry
 int insert(hashTable, pairLexemeToken); // returns 1 if new pair successfully inserted, 0 if entry already present
 
-struct twinBuffer
-{
-    FILE *fp;
-    char buffer[2][BUFLEN];
-    char *begin;
-    char *forward;
-    int forwardBufferNo, beginBufferNo;
-    int retractions;
-    int lineNo;
-};
-
-typedef struct twinBuffer *twinBuffer;
 
 twinBuffer initBuffer(char *);
 char nextChar(twinBuffer);
