@@ -11,6 +11,20 @@ pairLexemeToken createPairLexemeToken(char *s, token tk)
     return newPair;
 }
 
+tokenInfo createTokenInfo(pairLexemeToken plt, twinBuffer B)  
+{
+    tokenInfo ti = (tokenInfo) malloc(sizeof(struct tokenInfo));
+    ti->plt = plt;
+
+    if(plt->val == TK_NUM) ti->isNumber = 1;
+    else if (plt->val == TK_REAL) ti->isNumber = 2;
+    else ti->isNumber = 0;
+
+    if(ti->isNumber) ti->valueIfNumber =  plt->lexeme;
+    return ti;
+
+}
+
 hashTable createEmptyHashTable()
 {
     hashTable newTable = (hashTable)malloc(sizeof(struct hashTable));

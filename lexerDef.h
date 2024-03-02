@@ -75,6 +75,15 @@ struct pairLexemeToken
 };
 typedef struct pairLexemeToken *pairLexemeToken;
 
+struct tokenInfo 
+{
+    pairLexemeToken plt;
+    int lineNo;
+    int isNumber; // 0 for no, 1 for TK_NUM, 2 for TK_REAL
+    char* valueIfNumber; 
+};
+typedef struct tokenInfo* tokenInfo;
+
 struct hashTable
 {
     pairLexemeToken *items;
@@ -83,6 +92,8 @@ struct hashTable
 typedef struct hashTable *hashTable;
 
 pairLexemeToken createPairLexemeToken(char *, token);
+tokenInfo createTokenInfo(pairLexemeToken plt, twinBuffer B);
+
 hashTable createEmptyHashTable();
 int lookup(hashTable, char *);          // return -1 if string s not found, else return index of entry
 int insert(hashTable, pairLexemeToken); // returns 1 if new pair successfully inserted, 0 if entry already present
@@ -95,6 +106,7 @@ struct twinBuffer
     char *forward;
     int forwardBufferNo, beginBufferNo;
     int retractions;
+    int lineNo;
 };
 
 typedef struct twinBuffer *twinBuffer;

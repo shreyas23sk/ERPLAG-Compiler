@@ -93,22 +93,22 @@ void initLexer()
     k = insert(ht, createPairLexemeToken("!=", TK_NE));                 // not equal
 }
 
-pairLexemeToken acceptState(token tk, twinBuffer B)
+tokenInfo acceptState(token tk, twinBuffer B)
 {
-    return createPairLexemeToken(getLexeme(B), tk);
+    return createTokenInfo(createPairLexemeToken(getLexeme(B), tk), B);
 }
 
 /// @brief returns true if the input is a symbol
-bool isSym(char *c)
+int isSym(char *c)
 {
     if (lookup(ht, c) == -1)
     {
-        return false;
+        return 0;
     }
-    return true;
+    return 1;
 }
 
-pairLexemeToken getNextToken()
+tokenInfo getNextToken()
 {
     B = initBuffer(filename);
 
