@@ -4,5 +4,4 @@
 #endif
 
 void initGrammarRules();
-tokenSet computeFirstList(NodePtr rhs);
 void computeFirstAndFollow();
