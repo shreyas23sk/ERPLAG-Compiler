@@ -8,7 +8,7 @@
 #include "lexer.h"
 #endif
 
-// Macro for setting state to FINAL if INITIAL is encountered and CONDN is satisfied
+// Set INITIAL state to FINAL if CONDN is satisfied
 #define MOVE_IF(INITIAL, FINAL, CONDN) \
     if (state == INITIAL && (CONDN))   \
     {                                  \
@@ -16,7 +16,7 @@
         continue;                      \
     }
 
-// Macro for setting state to FINAL if INITIAL is encountered
+// Set INITIAL state to FINAL and continue
 #define MOVE(INITIAL, FINAL) \
     if (state == INITIAL)    \
     {                        \
@@ -24,8 +24,11 @@
         continue;            \
     }
 
-// Shorthand for switch-case blocks
+/// @brief Check if the state is equal to s
 #define CASE(s) if (state == s)
+
+/// @brief Check if the input is equal to x
+#define EQ(x) c == x
 
 char *fileName;
 twinBuffer B;
@@ -39,7 +42,6 @@ void initLexer(char *testCaseFileName)
 
     ht = createHashTable();
 
-    // Populate the hashmap
     insert(ht, "with", TK_WITH);
     insert(ht, "parameters", TK_PARAMETERS);
     insert(ht, "end", TK_END);
@@ -91,9 +93,7 @@ void initLexer(char *testCaseFileName)
     insert(ht, "!=", TK_NE);
 }
 
-/// @brief gives the token corresponding to string lex
-/// @param lex
-/// @return token code for the lex
+/// @brief Get the token code for the given lexeme
 token getTokenCode(char *lex)
 {
     int ind = lookup(ht, lex);
@@ -116,19 +116,67 @@ token getTokenCode(char *lex)
     return ht->items[ind]->val;
 }
 
-// Create token information for an accepted state
+/// @brief Create token information for an accepted state
 tokenInfo acceptState(token tk, twinBuffer B)
 {
     return createTokenInfo(createPairLexemeToken(getLexeme(B), tk), B);
 }
 
-// Check if the input is a symbol
-int isSym(char c)
+/// @brief Check if the input is a symbol
+int isSymbol(char c)
 {
     return lookup(ht, &c) != -1;
 }
 
-// Get the next token from the input
+/// @brief Check if the input is an alphabet
+int isAllAlpha(char c)
+{
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
+/// @brief Check if the input is a lowercase alphabet
+int isAlpha(char c)
+{
+    return c >= 'a' && c <= 'z';
+}
+
+/// @brief Check if the input is a variable alphabet (b, c, d)
+int isVarAlpha(char c)
+{
+    return EQ('b') || EQ('c') || EQ('d');
+}
+
+/// @brief Check if the input is a non-variable alphabet
+int isNonVarAlpha(char c)
+{
+    return isAllAlpha(c) && !isVarAlpha(c);
+}
+
+/// @brief Check if the input is a digit
+int isDigit(char c)
+{
+    return c >= '0' && c <= '9';
+}
+
+/// @brief Check if the input is a variable digit (2 to 7)
+int isVarDigit(char c)
+{
+    return c >= '2' && c <= '7';
+}
+
+/// @brief Check if the input is a non-variable digit
+int isNonVarDigit(char c)
+{
+    return isDigit(c) && !isVarDigit(c);
+}
+
+/// @brief Check if the input is a blank space
+int isBlank(char c)
+{
+    return EQ(' ') || EQ('\t');
+}
+
+/// @brief Get the next token from the input
 tokenInfo getNextToken()
 {
     char *lex;
@@ -139,32 +187,74 @@ tokenInfo getNextToken()
         char c = nextChar(B);
 
         // DFA Transitions
-        MOVE_IF(0, 19, isSym(c));
+        MOVE_IF(0, 19, isSymbol(c));
 
-        MOVE_IF(0, 16, c == '@');
-        MOVE_IF(16, 17, c == '@');
-        MOVE_IF(17, 18, c == '@');
+        MOVE_IF(0, 16, EQ('@'));
+        MOVE_IF(16, 17, EQ('@'));
+        MOVE_IF(17, 18, EQ('@'));
 
-        MOVE_IF(0, 13, c == '&');
-        MOVE_IF(13, 14, c == '&');
-        MOVE_IF(14, 15, c == '&');
+        MOVE_IF(0, 13, EQ('&'));
+        MOVE_IF(13, 14, EQ('&'));
+        MOVE_IF(14, 15, EQ('&'));
 
-        MOVE_IF(0, 48, c == '=');
-        MOVE_IF(48, 49, c == '=');
+        MOVE_IF(0, 48, EQ('='));
+        MOVE_IF(48, 49, EQ('='));
 
-        MOVE_IF(0, 11, c == '!');
-        MOVE_IF(11, 12, c == '=');
+        MOVE_IF(0, 11, EQ('!'));
+        MOVE_IF(11, 12, EQ('='));
 
-        MOVE_IF(0, 8, c == '>');
-        MOVE_IF(8, 9, c == '=');
+        MOVE_IF(0, 8, EQ('>'));
+        MOVE_IF(8, 9, EQ('='));
         MOVE(8, 10);
 
-        MOVE_IF(0, 1, c == '<');
-        MOVE_IF(1, 2, c == '-');
+        MOVE_IF(0, 1, EQ('<'));
+        MOVE_IF(1, 2, EQ('-'));
         MOVE(1, 7);
-        MOVE_IF(2, 3, c == '-');
+        MOVE_IF(2, 3, EQ('-'));
         MOVE(2, 5);
-        MOVE_IF(3, 4, c == '-');
+        MOVE_IF(3, 4, EQ('-'));
+
+        MOVE_IF(0, 23, isVarAlpha(c));
+        MOVE_IF(23, 24, isVarDigit(c));
+        MOVE_IF(23, 26, isAlpha(c));
+        MOVE(23, 28);
+        MOVE_IF(24, 24, isVarAlpha(c));
+        MOVE_IF(24, 25, isVarDigit(c));
+        MOVE(24, 26);
+        MOVE_IF(25, 25, isVarDigit(c));
+        MOVE(25, 26);
+
+        MOVE_IF(0, 27, isNonVarAlpha(c));
+        MOVE_IF(27, 27, isAlpha(c));
+        MOVE(27, 28);
+
+        MOVE_IF(0, 29, isDigit(c));
+        MOVE_IF(29, 29, isDigit(c));
+        MOVE_IF(29, 30, EQ('.'));
+        MOVE(29, 37);
+        MOVE_IF(30, 31, isDigit(c));
+        MOVE(30, 38);
+        MOVE_IF(31, 32, isDigit(c));
+        MOVE_IF(32, 33, EQ('E'));
+        MOVE(32, 47);
+        MOVE_IF(33, 34, EQ('+') || EQ('-'));
+        MOVE_IF(33, 35, isDigit(c));
+        MOVE_IF(34, 35, isDigit(c));
+        MOVE_IF(35, 36, isDigit(c));
+
+        MOVE_IF(0, 39, EQ('-'));
+        MOVE_IF(39, 40, isAllAlpha(c));
+        MOVE_IF(40, 40, isAllAlpha(c));
+        MOVE_IF(40, 41, isDigit(c));
+        MOVE(40, 42);
+        MOVE_IF(41, 41, isDigit(c));
+        MOVE(41, 42);
+
+        MOVE_IF(0, 43, EQ('#'));
+        MOVE_IF(43, 44, isAlpha(c));
+        MOVE_IF(44, 44, isAlpha(c));
+        MOVE(44, 45);
+
         MOVE_IF(0, 20, c == '%')
         MOVE_IF(0, 50, c == '\n');
 
@@ -209,6 +299,52 @@ tokenInfo getNextToken()
         CASE(4)
         return acceptState(TK_ASSIGNOP, B);
 
+        CASE(26)
+        {
+            retract(B);
+            return acceptState(TK_ID, B);
+        }
+
+        CASE(28)
+        {
+            retract(B);
+            return acceptState(getTokenCode(lex), B);
+        }
+
+        CASE(37)
+        {
+            retract(B);
+            return acceptState(TK_NUM, B);
+        }
+
+        CASE(38)
+        {
+            retract(B);
+            retract(B);
+            return acceptState(TK_NUM, B);
+        }
+
+        CASE(36)
+        return acceptState(TK_RNUM, B);
+
+        CASE(47)
+        {
+            retract(B);
+            return acceptState(TK_RNUM, B);
+        }
+
+        CASE(42)
+        {
+            retract(B);
+            return acceptState(getTokenCode(lex), B);
+        }
+
+        CASE(45)
+        {
+            retract(B);
+            return acceptState(TK_RUID, B);
+        }
+
         CASE(20)
         {
             return acceptState(TK_COMMENT, B);
@@ -222,6 +358,7 @@ tokenInfo getNextToken()
         }
     }
 }
+
 
 void removeComments(char *fileName, char *outputFileName)
 {
