@@ -28,7 +28,7 @@
 #define CASE(s) if (state == s)
 
 /// @brief Check if the input is equal to x
-#define EQ(x) x
+#define EQ(x) (c == x)
 
 char *fileName;
 twinBuffer B;
