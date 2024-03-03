@@ -108,9 +108,9 @@ pairLexemeToken createPairLexemeToken(const char *, token);
 tokenInfo createTokenInfo(pairLexemeToken plt, twinBuffer B);
 
 hashTable createEmptyHashTable();
-int lookup(hashTable, const char *); // return -1 if string s not found, else return index of entry
+int lookup(hashTable, const char *);
 int insert(hashTable, const char *, token);
-int insertInTable(hashTable, pairLexemeToken); // returns 1 if new pair successfully inserted, 0 if entry already present
+int insertInTable(hashTable, pairLexemeToken);
 
 twinBuffer initBuffer(char *);
 char nextChar(twinBuffer);

@@ -3,20 +3,20 @@
 #include "lexerDef.h"
 #endif
 
-// Macro for transition rules in DFAs
-#define TRANSITION(initState, cond, finState) \
-    if (state == initState && (cond))         \
-    {                                         \
-        state = finState;                     \
-        continue;                             \
+// Macro for setting state to FINAL if INITIAL is encountered and CONDN is satisfied
+#define MOVE_IF(INITIAL, FINAL, CONDN) \
+    if (state == INITIAL && (CONDN))   \
+    {                                  \
+        state = FINAL;                 \
+        continue;                      \
     }
 
-// Macro for setting state to finState if initState is encountered
-#define DEFAULT(initState, finState) \
-    if (state == initState)          \
-    {                                \
-        state = finState;            \
-        continue;                    \
+// Macro for setting state to FINAL if INITIAL is encountered
+#define MOVE(INITIAL, FINAL) \
+    if (state == INITIAL)    \
+    {                        \
+        state = FINAL;       \
+        continue;            \
     }
 
 // Shorthand for switch-case blocks
@@ -26,7 +26,7 @@ char *filename;
 twinBuffer B;
 hashTable ht;
 
-/// @brief Initialize the lexer and populate the hashmap
+// Initialize the lexer and populate the hashmap
 void initLexer()
 {
     ht = createEmptyHashTable();
@@ -85,8 +85,8 @@ void initLexer()
 
 /// @brief gives the token corresponding to string lex
 /// @param lex
-/// @return the token code
-token get_token_code(char *lex)
+/// @return token code for the lex
+token getTokenCode(char *lex)
 {
     int ind = lookup(ht, lex);
 
@@ -114,13 +114,13 @@ tokenInfo acceptState(token tk, twinBuffer B)
     return createTokenInfo(createPairLexemeToken(getLexeme(B), tk), B);
 }
 
-/// @brief Check if the input is a symbol
+// Check if the input is a symbol
 int isSym(char c)
 {
     return lookup(ht, &c) != -1;
 }
 
-/// @brief Get the next token from the input
+// Get the next token from the input
 tokenInfo getNextToken()
 {
     B = initBuffer(filename);
@@ -132,24 +132,28 @@ tokenInfo getNextToken()
     {
         char c = nextChar(B);
 
-        TRANSITION(0, c == '>', 8);
-        TRANSITION(0, c == '!', 11);
-        TRANSITION(8, c == '=', 9);
-        TRANSITION(0, c == '=', 48);
-        TRANSITION(0, c == '&', 13);
-        TRANSITION(0, c == '@', 16);
+        // DFA Implementation
+        MOVE_IF(0, 19, isSym(c));
 
-        if (isSym(c))
-            TRANSITION(0, 1, 19);
+        MOVE_IF(0, 16, c == '@');
+        MOVE(16, 17);
+        MOVE(17, 18);
 
-        DEFAULT(11, 12);
-        DEFAULT(8, 10);
-        DEFAULT(48, 49);
-        DEFAULT(13, 14);
-        DEFAULT(14, 15);
-        DEFAULT(16, 17);
-        DEFAULT(17, 18);
+        MOVE_IF(0, 13, c == '&');
+        MOVE(13, 14);
+        MOVE(14, 15);
 
+        MOVE_IF(0, 11, c == '!');
+        MOVE(11, 12);
+
+        MOVE_IF(0, 8, c == '>');
+        MOVE_IF(8, 9, c == '=');
+        MOVE(8, 10);
+
+        MOVE_IF(0, 48, c == '=');
+        MOVE(48, 49);
+
+        // Return cases
         CASE(9)
         return acceptState(TK_GE, B);
 
@@ -169,7 +173,7 @@ tokenInfo getNextToken()
         return acceptState(TK_OR, B);
 
         CASE(19)
-        return acceptState(get_token_code(lex), B);
+        return acceptState(getTokenCode(lex), B);
 
         CASE(49)
         return acceptState(TK_EQ, B);
