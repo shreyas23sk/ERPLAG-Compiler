@@ -2,6 +2,10 @@
 #define PARSERDEF
 #include "parserDef.h"
 #endif
+#ifndef LEXER
+#define LEXER
+#include "lexer.h"
+#endif
 
 #define NO_OF_RULES 96
 #define MAX_SIZE_OF_TNT 26
@@ -401,6 +405,56 @@ void computeFirstAndFollow()
     }
 
     printf("%d\n", isLL1);
+}
+
+ParseTreePtr parseInputSourceCode(char* testCaseFileName) {
+    initLexer(testCaseFileName);
+    
+    StackPtr stack = createStack();
+    push(stack, createSYM(NONTERM, "program"));
+
+    ParseTreePtr result = createParseTree();
+
+    // algorithm adapted from TB Ch4.4, pg 227
+    tokenInfo a = getNextToken();
+    SYM X = peek(stack);
+
+    while(X.tk != -1) 
+    {
+        if((X.type == TERM && X.tk == a->plt->val)) 
+        {
+            pop(stack);
+            a = getNextToken();
+        }
+        else if (X.type == NONTERM && X.nt == EPSILON) 
+        {
+            pop(stack);
+        }
+        else if (X.type == TERM) 
+        {
+            printf("Encountered error during parsing!\n");
+            break;
+        }
+        else if (LLParseTable[X.nt][a->plt->val] < 0) 
+        {
+            printf("Encountered error during parsing!\n");
+            break;
+        }
+        else 
+        {
+            LinkedListPtr production = grammar[LLParseTable[X.nt][a->plt->val]];
+            printList(production);
+
+            pop(stack);
+
+            NodePtr derivation = production->tail;
+            while(derivation->prev != production->head) {
+                push(stack, derivation->data);
+                derivation = derivation->prev;
+            }
+        }
+        X = peek(stack);
+    }
 }
 
 int main()
