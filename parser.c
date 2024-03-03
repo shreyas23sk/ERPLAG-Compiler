@@ -404,9 +404,10 @@ void computeFirstAndFollow()
     printf("%d\n", isLL1);
 }
 
-ParseTreePtr parseInputSourceCode(char* testCaseFileName) {
+ParseTreePtr parseInputSourceCode(char *testCaseFileName)
+{
     initLexer(testCaseFileName);
-    
+
     StackPtr stack = createStack();
     push(stack, createParseNode(createSYM(NONTERM, "program")));
 
@@ -416,41 +417,42 @@ ParseTreePtr parseInputSourceCode(char* testCaseFileName) {
     tokenInfo a = getNextToken();
     SYM X = (peek(stack))->val;
 
-    while(X.tk != -1) 
+    while (X.tk != -1)
     {
-        if((X.type == TERM && X.tk == a->plt->val)) 
+        if ((X.type == TERM && X.tk == a->plt->val))
         {
             pop(stack);
             a = getNextToken();
         }
-        else if (X.type == NONTERM && X.nt == EPSILON) 
+        else if (X.type == NONTERM && X.nt == EPSILON)
         {
             pop(stack);
         }
-        else if (X.type == TERM) 
+        else if (X.type == TERM)
         {
             printf("Encountered error during parsing!\n");
             break;
         }
-        else if (LLParseTable[X.nt][a->plt->val] < 0) 
+        else if (LLParseTable[X.nt][a->plt->val] < 0)
         {
             printf("Encountered error during parsing!\n");
             break;
         }
-        else 
+        else
         {
             LinkedListPtr production = grammar[LLParseTable[X.nt][a->plt->val]];
             printList(production);
 
             ParseNodePtr top = pop(stack);
 
-            if(result->root == NULL) 
+            if (result->root == NULL)
             {
                 result->root = top;
             }
 
             NodePtr derivation = production->tail;
-            while(derivation->prev != production->head) {
+            while (derivation->prev != production->head)
+            {
                 ParseNodePtr newNode = createParseNode(derivation->data);
                 push(stack, newNode);
                 addChild(top, newNode);

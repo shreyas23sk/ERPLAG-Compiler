@@ -3,5 +3,5 @@
 #include "lexerDef.h"
 #endif
 
-void initLexer(char*);
+void initLexer(char *);
 tokenInfo getNextToken();

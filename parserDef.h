@@ -114,20 +114,20 @@ typedef struct ParseTree
 } ParseTree;
 typedef ParseTree *ParseTreePtr;
 
-typedef struct ParseNodeLL 
+typedef struct ParseNodeLL
 {
-    struct ParseNodeLL* next;
-    struct ParseNodeLL* prev;
+    struct ParseNodeLL *next;
+    struct ParseNodeLL *prev;
     ParseNodePtr val;
 } ParseNodeLL;
-typedef ParseNodeLL* ParseNodeLLPtr;
+typedef ParseNodeLL *ParseNodeLLPtr;
 
-typedef struct Stack 
+typedef struct Stack
 {
     ParseNodeLLPtr top;
     ParseNodeLLPtr tail;
 } Stack;
-typedef Stack* StackPtr;
+typedef Stack *StackPtr;
 
 LinkedListPtr createLinkedList();
 NodePtr createNode(SYM newData);
