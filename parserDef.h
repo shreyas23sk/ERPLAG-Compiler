@@ -3,10 +3,6 @@
 #include "lexerDef.h"
 #endif
 
-#include "string.h"
-#include <stdio.h>
-#include <stdlib.h>
-
 typedef enum
 {
     program,
@@ -80,10 +76,6 @@ typedef struct
     NT nt;
 } SYM;
 
-NT stringToNT(char *);
-const char *NTtoString(NT);
-
-// Linked List
 typedef struct Node
 {
     SYM data;
@@ -99,7 +91,6 @@ typedef struct
 } LinkedList;
 typedef LinkedList *LinkedListPtr;
 
-// Parse Tree
 typedef struct ParseNode
 {
     SYM val;
@@ -129,6 +120,9 @@ typedef struct Stack
 } Stack;
 typedef Stack *StackPtr;
 
+NT stringToNT(char *);
+const char *NTtoString(NT);
+
 LinkedListPtr createLinkedList();
 NodePtr createNode(SYM newData);
 void insertNode(LinkedListPtr list, SYM newData);
@@ -138,9 +132,10 @@ StackPtr createStack();
 void push(StackPtr stack, ParseNodePtr node);
 ParseNodePtr pop(StackPtr stack);
 ParseNodePtr peek(StackPtr stack);
-int isStackEmpty(StackPtr stack);
+int isEmpty(StackPtr stack);
 
 ParseTreePtr createParseTree();
 ParseNodePtr createParseNode(SYM value);
 void addChild(ParseNodePtr parent, ParseNodePtr child);
+void printParseTreeHelper(ParseNodePtr node, int depth);
 void printParseTree(ParseTreePtr tree);

@@ -32,31 +32,19 @@ int LLParseTable[NO_OF_NONTERMS][NO_OF_TERMS] = {{-1}};
 void printTokenSet(tokenSet ts)
 {
     for (int i = 0; i < ts->size; i++)
-    {
         printf("%s ", tokenToString(ts->set[i]));
-    }
+
     printf("\n");
 }
 
 tokenSet addTokenToTokenSet(tokenSet S, token tk)
 {
-    if (S->size == 0)
-    {
-        S->set = (token *)malloc(sizeof(token));
-        S->set[0] = tk;
-        S->size++;
-        return S;
-    }
-    else
-    {
-        S->set = (token *)realloc(S->set, S->size + 1);
-        S->set[S->size] = tk;
-        S->size++;
-    }
+    S->set = (token *)realloc(S->set, (S->size + 1) * sizeof(token));
+    S->set[S->size++] = tk;
+
+    return S;
 }
 
-// A = A union B if withEpsilon = 1
-// A = A union B - {EPSILON} otherwise
 tokenSet unionTokenSet(tokenSet A, tokenSet B, int withEpsilon)
 {
     int inSetA[NO_OF_TERMS] = {0};
@@ -113,14 +101,12 @@ SYM createSYM(TNT type, char *str)
 {
     SYM data;
     data.type = type;
+
     if (type == TERM)
-    {
         data.tk = stringToToken(str);
-    }
     else
-    {
         data.nt = stringToNT(str);
-    }
+
     return data;
 }
 
@@ -138,7 +124,7 @@ void addSymToGrammar(char *tnt, LinkedListPtr *grammar, int gIndex)
     insertNode(grammar[gIndex], data);
 }
 
-// @brief initializes the grammar rules by reading grammar.txt
+/// @brief initializes the grammar rules by reading grammar.txt
 void initGrammarRules()
 {
     grammar = (LinkedListPtr *)malloc(sizeof(LinkedListPtr) * NO_OF_RULES);
@@ -302,11 +288,13 @@ void computeFirst()
             firstSet[pi->head->data.nt] = unionTokenSet(firstSet[pi->head->data.nt], computeFirstList(pi->head->next), 1);
         }
     }
+
     /*
     for(int i = 0; i < NO_OF_NONTERMS; i++) {
         printf("%s :- ", NTtoString(i));
         printTokenSet(firstSet[i]);
-    } */
+    }
+    */
 }
 
 void computeFollow()
@@ -474,6 +462,7 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
 int main()
 {
     initGrammarRules();
+
     /*
     for(int i = 0; i < NO_OF_RULES; i++) {
         printf("%d :- ", i);
