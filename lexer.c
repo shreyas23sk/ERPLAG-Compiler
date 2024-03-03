@@ -166,8 +166,7 @@ tokenInfo getNextToken()
         MOVE(2, 5);
         MOVE_IF(3, 4, c == '-');
 
-
-        MOVE_IF(0,46,c=='\n');
+        MOVE_IF(0, 46, c == '\n');
 
         // DFA Returns
         CASE(19)
@@ -210,12 +209,31 @@ tokenInfo getNextToken()
         CASE(4)
         return acceptState(TK_ASSIGNOP, B);
 
-
         CASE(46)
         {
             // INCREMENT THE LINE BUFFER
             B->lineNo++;
-            MOVE(46,0);
+            MOVE(46, 0);
         }
     }
+}
+
+void removeComments(char *fileName, char *outputFileName) {
+    FILE *fp = fopen(fileName, "r"); 
+    FILE *fp2 = fopen(outputFileName, "w");
+    char c;
+    int k = 0;
+
+    while ((c = fgetc(fp)) != EOF) {
+        if (c == '%') {
+            k = 1;
+        } else if (c == '\n') {
+            k = 0;
+        }
+        if (k == 0) {
+            fputc(c, fp2);
+        }
+    }
+    fclose(fp);
+    fclose(fp2);
 }
