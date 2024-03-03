@@ -128,6 +128,54 @@ int isSym(char c)
     return lookup(ht, &c) != -1;
 }
 
+// Check if the input is an alphabet
+int isAllAlpha(char c)
+{
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
+// Check if the input is a lowercase alphabet
+int isAlpha(char c)
+{
+    return c >= 'a' && c <= 'z';
+}
+
+// Check if the input is a variable alphabet (b, c, d)
+int isVarAlpha(char c)
+{
+    return c == 'b' || c == 'c' || c == 'd';
+}
+
+// Check if the input is a non-variable alphabet
+int isNonVarAlpha(char c)
+{
+    return isAllAlpha(c) && !isVarAlpha(c);
+}
+
+// Check if the input is a digit
+int isDigit(char c)
+{
+    return c >= '0' && c <= '9';
+}
+
+// Check if the input is a variable digit (2 to 7)
+int isVarDigit(char c)
+{
+    return c >= '2' && c <= '7';
+}
+
+// Check if the input is a non-variable digit
+int isNonVarDigit(char c)
+{
+    return isDigit(c) && !isVarDigit(c);
+}
+
+// Check if the input is a blank space
+int isBlank(char c)
+{
+    return c == ' ' || c == '\t';
+}
+
 // Get the next token from the input
 tokenInfo getNextToken()
 {
@@ -165,6 +213,47 @@ tokenInfo getNextToken()
         MOVE_IF(2, 3, c == '-');
         MOVE(2, 5);
         MOVE_IF(3, 4, c == '-');
+
+        MOVE_IF(0, 23, isVarAlpha(c));
+        MOVE_IF(23, 24, isVarDigit(c));
+        MOVE_IF(23, 26, isAlpha(c));
+        MOVE(23, 28);
+        MOVE_IF(24, 24, isVarAlpha(c));
+        MOVE_IF(24, 25, isVarDigit(c));
+        MOVE(24, 26);
+        MOVE_IF(25, 25, isVarDigit(c));
+        MOVE(25, 26);
+
+        MOVE_IF(0, 27, isNonVarAlpha(c));
+        MOVE_IF(27, 27, isAlpha(c));
+        MOVE(27, 28);
+
+        MOVE_IF(0, 29, isDigit(c));
+        MOVE_IF(29, 29, isDigit(c));
+        MOVE_IF(29, 30, c == '.');
+        MOVE(29, 37);
+        MOVE_IF(30, 31, isDigit(c));
+        MOVE(30, 38);
+        MOVE_IF(31, 32, isDigit(c));
+        MOVE_IF(32, 33, c == 'E');
+        MOVE(32, 47);
+        MOVE_IF(33, 34, c == '+' || c == '-');
+        MOVE_IF(33, 35, isDigit(c));
+        MOVE_IF(34, 35, isDigit(c));
+        MOVE_IF(35, 36, isDigit(c));
+
+        MOVE_IF(0, 39, c == '-');
+        MOVE_IF(39, 40, isAllAlpha(c));
+        MOVE_IF(40, 40, isAllAlpha(c));
+        MOVE_IF(40, 41, isDigit(c));
+        move(40, 42);
+        MOVE_IF(41, 41, isDigit(c));
+        MOVE(41, 42);
+
+        MOVE_IF(0, 43, c == '#');
+        MOVE_IF(43, 44, isAlpha(c));
+        MOVE_IF(44, 44, isAlpha(c));
+        MOVE(44, 45);
 
         // DFA Returns
         CASE(19)
@@ -206,5 +295,51 @@ tokenInfo getNextToken()
 
         CASE(4)
         return acceptState(TK_ASSIGNOP, B);
+
+        CASE(26)
+        {
+            retract(B);
+            return acceptState(TK_ID, B);
+        }
+
+        CASE(28)
+        {
+            retract(B);
+            return acceptState(getTokenCode(lex), B);
+        }
+
+        CASE(37)
+        {
+            retract(B);
+            return acceptState(TK_NUM, B);
+        }
+
+        CASE(38)
+        {
+            retract(B);
+            retract(B);
+            return acceptState(TK_NUM, B);
+        }
+
+        CASE(36)
+        return acceptState(TK_RNUM, B);
+
+        CASE(47)
+        {
+            retract(B);
+            return acceptState(TK_RNUM, B);
+        }
+
+        CASE(42)
+        {
+            retract(B);
+            return acceptState(getTokenCode(lex), B);
+        }
+
+        CASE(45)
+        {
+            retract(B);
+            return acceptState(TK_RUID, B);
+        }
     }
 }
