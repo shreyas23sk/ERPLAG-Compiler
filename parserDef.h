@@ -99,13 +99,6 @@ typedef struct
 } LinkedList;
 typedef LinkedList *LinkedListPtr;
 
-// Stack
-typedef struct
-{
-    LinkedListPtr ll;
-} Stack;
-typedef Stack *StackPtr;
-
 // Parse Tree
 typedef struct ParseNode
 {
@@ -119,8 +112,22 @@ typedef struct ParseTree
 {
     struct ParseNode *root;
 } ParseTree;
-
 typedef ParseTree *ParseTreePtr;
+
+typedef struct ParseNodeLL 
+{
+    struct ParseNodeLL* next;
+    struct ParseNodeLL* prev;
+    ParseNodePtr val;
+} ParseNodeLL;
+typedef ParseNodeLL* ParseNodeLLPtr;
+
+typedef struct Stack 
+{
+    ParseNodeLLPtr top;
+    ParseNodeLLPtr tail;
+} Stack;
+typedef Stack* StackPtr;
 
 LinkedListPtr createLinkedList();
 NodePtr createNode(SYM newData);
@@ -128,12 +135,12 @@ void insertNode(LinkedListPtr list, SYM newData);
 void printList(LinkedListPtr ptr);
 
 StackPtr createStack();
-void push(StackPtr stack, SYM newData);
-SYM pop(StackPtr stack);
-SYM peek(StackPtr stack);
+void push(StackPtr stack, ParseNodePtr node);
+ParseNodePtr pop(StackPtr stack);
+ParseNodePtr peek(StackPtr stack);
 int isStackEmpty(StackPtr stack);
 
 ParseTreePtr createParseTree();
 ParseNodePtr createParseNode(SYM value);
-void addChild(ParseNodePtr parent, SYM value);
+void addChild(ParseNodePtr parent, ParseNodePtr child);
 void printParseTree(ParseTreePtr tree);

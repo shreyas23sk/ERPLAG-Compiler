@@ -3,6 +3,11 @@
 #include "lexerDef.h"
 #endif
 
+#ifndef LEXER
+#define LEXER
+#include "lexer.h"
+#endif
+
 // Macro for setting state to FINAL if INITIAL is encountered and CONDN is satisfied
 #define MOVE_IF(INITIAL, FINAL, CONDN) \
     if (state == INITIAL && (CONDN))   \
@@ -22,13 +27,16 @@
 // Shorthand for switch-case blocks
 #define CASE(s) if (state == s)
 
-char *filename;
+char *fileName;
 twinBuffer B;
 hashTable ht;
 
 // Initialize the lexer and populate the hashmap
-void initLexer()
+void initLexer(char *testCaseFileName)
 {
+    fileName = testCaseFileName;
+    B = initBuffer(fileName);
+
     ht = createHashTable();
 
     // Populate the hashmap
@@ -123,8 +131,6 @@ int isSym(char c)
 // Get the next token from the input
 tokenInfo getNextToken()
 {
-    B = initBuffer(filename);
-
     char *lex;
     int state = 0;
 
