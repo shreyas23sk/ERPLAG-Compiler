@@ -138,28 +138,50 @@ tokenInfo getNextToken()
     {
         char c = nextChar(B);
 
-        // DFA Implementation
+        // DFA Transitions
         MOVE_IF(0, 19, isSym(c));
 
         MOVE_IF(0, 16, c == '@');
-        MOVE_IF(16, 17,c=='@');
-        MOVE_IF(17, 18,c=='@');
+        MOVE_IF(16, 17, c == '@');
+        MOVE_IF(17, 18, c == '@');
 
         MOVE_IF(0, 13, c == '&');
-        MOVE_IF(13, 14,c=='&');
-        MOVE_IF(14, 15,c == '&');
+        MOVE_IF(13, 14, c == '&');
+        MOVE_IF(14, 15, c == '&');
+
+        MOVE_IF(0, 48, c == '=');
+        MOVE_IF(48, 49, c == '=');
 
         MOVE_IF(0, 11, c == '!');
-        MOVE_IF(11, 12,c == '=');
+        MOVE_IF(11, 12, c == '=');
 
         MOVE_IF(0, 8, c == '>');
         MOVE_IF(8, 9, c == '=');
         MOVE(8, 10);
 
-        MOVE_IF(0, 48, c == '=');
-        MOVE_IF(48, 49,c == '=');
+        MOVE_IF(0, 1, c == '<');
+        MOVE_IF(1, 2, c == '-');
+        MOVE(1, 7);
+        MOVE_IF(2, 3, c == '-');
+        MOVE(2, 5);
+        MOVE_IF(3, 4, c == '-');
 
-        // Return cases
+        // DFA Returns
+        CASE(19)
+        return acceptState(getTokenCode(lex), B);
+
+        CASE(18)
+        return acceptState(TK_OR, B);
+
+        CASE(15)
+        return acceptState(TK_AND, B);
+
+        CASE(49)
+        return acceptState(TK_EQ, B);
+
+        CASE(12)
+        return acceptState(TK_NE, B);
+
         CASE(9)
         return acceptState(TK_GE, B);
 
@@ -169,19 +191,20 @@ tokenInfo getNextToken()
             return acceptState(TK_GT, B);
         }
 
-        CASE(12)
-        return acceptState(TK_NE, B);
+        CASE(7)
+        return acceptState(TK_LT, B);
 
-        CASE(15)
-        return acceptState(TK_AND, B);
+        CASE(6)
+        return acceptState(TK_LE, B);
 
-        CASE(18)
-        return acceptState(TK_OR, B);
+        CASE(5)
+        {
+            retract(B);
+            retract(B);
+            return acceptState(TK_LT, B);
+        }
 
-        CASE(19)
-        return acceptState(getTokenCode(lex), B);
-
-        CASE(49)
-        return acceptState(TK_EQ, B);
+        CASE(4)
+        return acceptState(TK_ASSIGNOP, B);
     }
 }
