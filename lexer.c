@@ -157,7 +157,7 @@ tokenInfo getNextToken()
         MOVE(8, 10);
 
         MOVE_IF(0, 48, c == '=');
-        MOVE(48, 49);
+        MOVE_IF(48, 49,c == '=');
 
         // Return cases
         CASE(9)
