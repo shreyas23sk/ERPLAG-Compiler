@@ -23,11 +23,19 @@
         state = FINAL;       \
     }
 
+/// @brief Check if the input is equal to x
+#define EQ(x) (c == x)
+
 /// @brief Check if the state is equal to s
 #define CASE(s) if (state == s)
 
-/// @brief Check if the input is equal to x
-#define EQ(x) (c == x)
+/// @brief Throw an error for unknown pattern
+#define ERROR(i)           \
+    if (state == i)        \
+    {                      \
+        printf("Error\n"); \
+        return NULL;       \
+    }
 
 char *fileName;
 twinBuffer B;
@@ -208,12 +216,14 @@ tokenInfo getNextToken()
     while (1)
     {
         char c = nextChar(B);
-        
-        //printf("Char - %c State - %d\n", c, state);
-        // DFA Transitions
-        if(state == 0 && (c == ' ' || c == '\n' || c == '\t')) 
+
+        // printf("Char - %c State - %d\n", c, state);
+
+        //  DFA Transitions
+        if (state == 0 && (c == ' ' || c == '\n' || c == '\t'))
         {
-            if(c == '\n') B->lineNo++;
+            if (c == '\n')
+                B->lineNo++;
             resetBegin(B);
             continue;
         }
@@ -221,8 +231,7 @@ tokenInfo getNextToken()
 
         MOVE_IF(0, 16, EQ('@'));
         MOVE_IF(16, 17, EQ('@'));
-        if(state == 16)
-            printf("Unknown Pattern:- %s\n", getLexeme(B));
+        ERROR(16);
         MOVE_IF(17, 18, EQ('@'));
 
         MOVE_IF(0, 13, EQ('&'));
@@ -289,7 +298,7 @@ tokenInfo getNextToken()
 
         MOVE_IF(0, 20, EQ('%'));
         MOVE_IF(0, 50, EQ('\n'));
-        
+
         // DFA Returns
         CASE(19)
         {
@@ -384,21 +393,21 @@ tokenInfo getNextToken()
         {
             return acceptState(TK_COMMENT, B);
         }
-
-
     }
 }
 
-
-int main() { 
+int main()
+{
     removeComments("testcase.txt", "final.txt");
     initLexer("final.txt");
     tokenInfo test = getNextToken();
     printf("%s %s\n", test->plt->lexeme, tokenToString(test->plt->val));
     int j = 0;
-    while(j < 120) {
+    while (j < 120)
+    {
         test = getNextToken();
-        if(test == NULL) break;
+        if (test == NULL)
+            break;
         printf("%d %s %s\n", test->lineNo, test->plt->lexeme, tokenToString(test->plt->val));
         j++;
     }

@@ -120,6 +120,15 @@ typedef struct Stack
 } Stack;
 typedef Stack *StackPtr;
 
+typedef struct
+{
+    token *set;
+    int eps;
+    int endOfInput;
+    int size;
+} TKSET;
+typedef TKSET *tokenSet;
+
 NT stringToNT(char *);
 const char *NTtoString(NT);
 

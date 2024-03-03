@@ -15,15 +15,6 @@
 #define NO_OF_TERMS 57
 #define NO_OF_NONTERMS 56
 
-typedef struct
-{
-    token *set;
-    int eps;
-    int endOfInput;
-    int size;
-} TKSET;
-typedef TKSET *tokenSet;
-
 LinkedListPtr *grammar;
 tokenSet firstSet[NO_OF_NONTERMS];
 tokenSet followSet[NO_OF_NONTERMS];
