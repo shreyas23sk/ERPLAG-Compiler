@@ -166,6 +166,9 @@ tokenInfo getNextToken()
         MOVE(2, 5);
         MOVE_IF(3, 4, c == '-');
 
+
+        MOVE_IF(0,46,c=='\n');
+
         // DFA Returns
         CASE(19)
         return acceptState(getTokenCode(lex), B);
@@ -206,5 +209,13 @@ tokenInfo getNextToken()
 
         CASE(4)
         return acceptState(TK_ASSIGNOP, B);
+
+
+        CASE(46)
+        {
+            // INCREMENT THE LINE BUFFER
+            B->lineNo++;
+            MOVE(46,0);
+        }
     }
 }
