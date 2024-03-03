@@ -142,12 +142,12 @@ tokenInfo getNextToken()
         MOVE_IF(0, 19, isSym(c));
 
         MOVE_IF(0, 16, c == '@');
-        MOVE(16, 17);
-        MOVE(17, 18);
+        MOVE_IF(16, 17,c=='@');
+        MOVE_IF(17, 18,c=='@');
 
         MOVE_IF(0, 13, c == '&');
-        MOVE(13, 14);
-        MOVE(14, 15);
+        MOVE_IF(13, 14,c=='&');
+        MOVE_IF(14, 15,c == '&');
 
         MOVE_IF(0, 11, c == '!');
         MOVE(11, 12);
