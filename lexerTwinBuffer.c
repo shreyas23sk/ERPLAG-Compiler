@@ -19,7 +19,6 @@ twinBuffer initBuffer(char *filename)
     B->lineNo = 1;
     B->fp = fopen(filename, "r");
     B->retractions = 0;
-    
 
     if (B->fp == NULL)
     {
@@ -42,7 +41,7 @@ twinBuffer reload(twinBuffer B)
 }
 
 twinBuffer advance(twinBuffer B)
-{   
+{
     if (B->forward == B->buffer[B->forwardBufferNo] + BUFLEN - 1)
     {
         B->forwardBufferNo = !B->forwardBufferNo;
@@ -58,7 +57,7 @@ twinBuffer advance(twinBuffer B)
 
     if (B->retractions > 0)
         B->retractions--;
-    
+
     return B;
 }
 
@@ -86,7 +85,7 @@ twinBuffer resetBegin(twinBuffer B)
     advance(B);
     B->begin = B->forward;
     B->beginBufferNo = B->forwardBufferNo;
-    
+
     retract(B);
     B->retractions = 0;
 
@@ -97,42 +96,44 @@ char *getLexeme(twinBuffer B)
 {
     int lexLength = 0;
 
-    if(*B->begin == ' ') B->begin++;
+    if (*B->begin == ' ')
+        B->begin++;
 
-    if(B->beginBufferNo == B->forwardBufferNo) 
+    if (B->beginBufferNo == B->forwardBufferNo)
     {
         lexLength = B->forward - B->begin + 1;
         char* lexeme = (char *) malloc(sizeof(char) * (lexLength + 1));
         
         int i = 0;
-        while(i < lexLength) {
+        while (i < lexLength)
+        {
             lexeme[i] = *(B->begin + i);
             i++;
         }
         lexeme[lexLength] = '\0';
 
         return lexeme;
-    } 
-    else 
+    }
+    else
     {
         int lexLength1 = B->buffer[B->beginBufferNo] + BUFLEN - 1 - B->begin;
         int lexLength2 = B->forward - B->buffer[B->forwardBufferNo];
 
-        char* lexeme = (char *) malloc(sizeof(char) * (lexLength1 + lexLength2 + 1));
+        char *lexeme = (char *)malloc(sizeof(char) * (lexLength1 + lexLength2 + 1));
 
         int i = 0, j = 0;
 
-        while(i < lexLength1) 
+        while (i < lexLength1)
         {
             lexeme[i] = *(B->begin + i);
             i++;
         }
 
-        while(j < lexLength2)
+        while (j < lexLength2)
         {
             lexeme[lexLength1 + j] = *(B->buffer[B->forwardBufferNo] + j);
             j++;
-        } 
+        }
 
         lexeme[lexLength1 + lexLength2] = '\0';
 
