@@ -150,7 +150,7 @@ tokenInfo getNextToken()
         MOVE_IF(14, 15,c == '&');
 
         MOVE_IF(0, 11, c == '!');
-        MOVE(11, 12);
+        MOVE_IF(11, 12,c == '=');
 
         MOVE_IF(0, 8, c == '>');
         MOVE_IF(8, 9, c == '=');
