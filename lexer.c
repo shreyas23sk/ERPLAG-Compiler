@@ -28,7 +28,7 @@
 #define CASE(s) if (state == s)
 
 /// @brief Check if the input is equal to x
-#define EQ(x) c == x
+#define EQ(x) x
 
 char *fileName;
 twinBuffer B;
@@ -120,6 +120,34 @@ token getTokenCode(char *lex)
 tokenInfo acceptState(token tk, twinBuffer B)
 {
     return createTokenInfo(createPairLexemeToken(getLexeme(B), tk), B);
+}
+
+/// @brief Remove comments from the input file
+void removeComments(char *fileName, char *outputFileName)
+{
+    FILE *fp = fopen(fileName, "r");
+    FILE *fp2 = fopen(outputFileName, "w");
+
+    if (!fp || !fp2)
+    {
+        printf("Error opening file!\n");
+        return;
+    }
+
+    char c;
+    int k = 0;
+
+    while ((c = fgetc(fp)) != EOF)
+    {
+        k = EQ('%') ? 1 : k;
+        k = EQ('\n') ? 0 : k;
+
+        if (!k)
+            fputc(c, fp2);
+    }
+
+    fclose(fp);
+    fclose(fp2);
 }
 
 /// @brief Check if the input is a symbol
@@ -255,9 +283,8 @@ tokenInfo getNextToken()
         MOVE_IF(44, 44, isAlpha(c));
         MOVE(44, 45);
 
-        MOVE_IF(0, 20, c == '%')
-        MOVE_IF(0, 50, c == '\n');
-      
+        MOVE_IF(0, 20, EQ('%'));
+        MOVE_IF(0, 50, EQ('\n'));
 
         // DFA Returns
         CASE(19)
@@ -345,7 +372,6 @@ tokenInfo getNextToken()
             retract(B);
             return acceptState(TK_RUID, B);
         }
-      
 
         CASE(20)
         {
@@ -359,31 +385,4 @@ tokenInfo getNextToken()
             MOVE(50, 0);
         }
     }
-}
-
-
-void removeComments(char *fileName, char *outputFileName)
-{
-    FILE *fp = fopen(fileName, "r");
-    FILE *fp2 = fopen(outputFileName, "w");
-    char c;
-    int k = 0;
-
-    while ((c = fgetc(fp)) != EOF)
-    {
-        if (c == '%')
-        {
-            k = 1;
-        }
-        else if (c == '\n')
-        {
-            k = 0;
-        }
-        if (k == 0)
-        {
-            fputc(c, fp2);
-        }
-    }
-    fclose(fp);
-    fclose(fp2);
 }
