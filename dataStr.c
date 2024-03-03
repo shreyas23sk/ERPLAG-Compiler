@@ -54,50 +54,55 @@ void printList(LinkedListPtr list)
     
     printf("\n");
 }
-
-StackPtr createStack()
-{
-    StackPtr newStack = (StackPtr)malloc(sizeof(Stack));
-    newStack->ll = createLinkedList();
-    return newStack;
+StackPtr createStack() {
+    StackPtr stack = (StackPtr)malloc(sizeof(Stack));
+    stack->top = NULL;
+    stack->tail = NULL;
+    return stack;
 }
 
-void push(StackPtr stack, SYM newData)
-{
-    insertNode(stack->ll, newData);
-}
-
-int isStackEmpty(StackPtr stack)
-{
-    return (stack->ll->head == NULL);
-}
-
-SYM pop(StackPtr stack)
-{
-    Node *nodeToPop = stack->ll->tail;
-    SYM data = nodeToPop->data;
-
-    // Update tail of the linked list
-    stack->ll->tail = nodeToPop->prev;
-
-    // Check if the popped node was the only node in the list
-    if (stack->ll->tail != NULL)
-    {
-        stack->ll->tail->next = NULL;
+void push(StackPtr stack, ParseNodePtr node) {
+    ParseNodeLLPtr newNode = (ParseNodeLLPtr)malloc(sizeof(ParseNodeLL));
+    newNode->val = node;
+    
+    if (stack->top == NULL) {
+        stack->top = newNode;
+        stack->tail = newNode;
+        newNode->prev = NULL;
+        newNode->next = NULL;
+    } else {
+        newNode->next = stack->top;
+        stack->top->prev = newNode;
+        stack->top = newNode;
     }
-    else
-    {
-        // If there was only one node, update head as well
-        stack->ll->head = NULL;
-    }
-
-    free(nodeToPop); // Free memory of the popped node
-    return data;
 }
 
-SYM peek(StackPtr stack)
-{
-    return stack->ll->tail->data;
+ParseNodePtr pop(StackPtr stack) {
+    if (stack->top == NULL) {
+        return NULL;
+    }
+    
+    ParseNodeLLPtr temp = stack->top;
+    
+    if (stack->top == stack->tail) {
+        stack->top = NULL;
+        stack->tail = NULL;
+    } else {
+        stack->top = stack->top->next;
+        stack->top->prev = NULL;
+    }
+    
+    temp->next = NULL;
+    
+    return temp->val;
+}
+
+ParseNodePtr peek(StackPtr stack) {
+    return stack->top->val;
+}
+
+int isStackEmpty(StackPtr stack) {
+    return (stack->top == NULL);
 }
 
 ParseTreePtr createParseTree()
@@ -116,9 +121,8 @@ ParseNodePtr createParseNode(SYM value)
     return newNode;
 }
 
-void addChild(ParseNodePtr parent, SYM value)
+void addChild(ParseNodePtr parent, ParseNodePtr child)
 {
-    ParseNodePtr child = createParseNode(value);
     parent->noOfChildren++;
     parent->children = (ParseNodePtr *)realloc(parent->children, parent->noOfChildren * sizeof(ParseNodePtr));
     parent->children[parent->noOfChildren - 1] = child;

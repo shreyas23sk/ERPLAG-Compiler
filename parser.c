@@ -408,13 +408,13 @@ ParseTreePtr parseInputSourceCode(char* testCaseFileName) {
     initLexer(testCaseFileName);
     
     StackPtr stack = createStack();
-    push(stack, createSYM(NONTERM, "program"));
+    push(stack, createParseNode(createSYM(NONTERM, "program")));
 
     ParseTreePtr result = createParseTree();
 
     // algorithm adapted from TB Ch4.4, pg 227
     tokenInfo a = getNextToken();
-    SYM X = peek(stack);
+    SYM X = (peek(stack))->val;
 
     while(X.tk != -1) 
     {
@@ -442,16 +442,25 @@ ParseTreePtr parseInputSourceCode(char* testCaseFileName) {
             LinkedListPtr production = grammar[LLParseTable[X.nt][a->plt->val]];
             printList(production);
 
-            pop(stack);
+            ParseNodePtr top = pop(stack);
+
+            if(result->root == NULL) 
+            {
+                result->root = top;
+            }
 
             NodePtr derivation = production->tail;
             while(derivation->prev != production->head) {
-                push(stack, derivation->data);
+                ParseNodePtr newNode = createParseNode(derivation->data);
+                push(stack, newNode);
+                addChild(top, newNode);
                 derivation = derivation->prev;
             }
         }
-        X = peek(stack);
+        X = peek(stack)->val;
     }
+
+    return result;
 }
 
 int main()
