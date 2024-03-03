@@ -80,43 +80,47 @@ typedef struct
     NT nt;
 } SYM;
 
-const char *NTtoString(NT);
 NT stringToNT(char *);
+const char *NTtoString(NT);
 
 // Linked List
-typedef struct Node {
+typedef struct Node
+{
     SYM data;
-    struct Node* next;
-    struct Node* prev;
+    struct Node *next;
+    struct Node *prev;
 } Node;
+typedef Node *NodePtr;
 
-typedef struct {
-    Node* head;
-    Node* tail;
+typedef struct
+{
+    Node *head;
+    Node *tail;
 } LinkedList;
-
-typedef Node* NodePtr;
-typedef LinkedList* LinkedListPtr;
+typedef LinkedList *LinkedListPtr;
 
 // Stack
-typedef struct {
+typedef struct
+{
     LinkedListPtr ll;
 } Stack;
-typedef Stack* StackPtr;
+typedef Stack *StackPtr;
 
 // Parse Tree
-typedef struct ParseNode {
+typedef struct ParseNode
+{
     SYM val;
-    struct ParseNode** children;
+    struct ParseNode **children;
     int noOfChildren;
 } ParseNode;
+typedef ParseNode *ParseNodePtr;
 
-typedef struct ParseTree {
-    struct ParseNode* root;
+typedef struct ParseTree
+{
+    struct ParseNode *root;
 } ParseTree;
 
-typedef ParseNode* ParseNodePtr;
-typedef ParseTree* ParseTreePtr;
+typedef ParseTree *ParseTreePtr;
 
 LinkedListPtr createLinkedList();
 NodePtr createNode(SYM newData);

@@ -3,54 +3,69 @@
 #include "lexerDef.h"
 #endif
 
-pairLexemeToken createPairLexemeToken(char *s, token tk)
-{
-    pairLexemeToken newPair = (pairLexemeToken)malloc(sizeof(struct pairLexemeToken));
-    newPair->lexeme = s;
-    newPair->val = tk;
-    return newPair;
-}
-
-tokenInfo createTokenInfo(pairLexemeToken plt, twinBuffer B)  
-{
-    tokenInfo ti = (tokenInfo) malloc(sizeof(struct tokenInfo));
-    ti->plt = plt;
-
-    if(plt->val == TK_NUM) ti->isNumber = 1;
-    else if (plt->val == TK_REAL) ti->isNumber = 2;
-    else ti->isNumber = 0;
-
-    if(ti->isNumber) ti->valueIfNumber =  plt->lexeme;
-    return ti;
-
-}
-
 hashTable createEmptyHashTable()
 {
     hashTable newTable = (hashTable)malloc(sizeof(struct hashTable));
+
+    if (!newTable == NULL)
+        return NULL;
+
     newTable->size = 0;
+    newTable->items = NULL;
+
     return newTable;
 }
 
-int lookup(hashTable ht, char *s)
+int lookup(hashTable ht, const char *s)
 {
+    if (!ht || ht->size == 0)
+        return -1;
+
     for (int i = 0; i < ht->size; i++)
     {
         if (strcmp(ht->items[i]->lexeme, s) == 0)
             return i;
     }
+
     return -1;
 }
 
-int insert(hashTable ht, pairLexemeToken plt)
+int insert(hashTable ht, const char *s, token tk)
+{
+    pairLexemeToken plt = createPairLexemeToken(s, tk);
+
+    if (!plt)
+        return 0;
+
+    int inserted = insertInTable(ht, plt);
+
+    if (!inserted)
+    {
+        free(plt->lexeme);
+        free(plt);
+    }
+
+    return inserted;
+}
+
+int insertInTable(hashTable ht, pairLexemeToken plt)
 {
     if (lookup(ht, plt->lexeme) < 0)
     {
         ht->size++;
         ht->items = (pairLexemeToken *)realloc(ht->items, sizeof(pairLexemeToken) * (ht->size));
+
+        if (ht->items == NULL)
+        {
+            ht->size--;
+            return 0;
+        }
+
         ht->items[ht->size - 1] = plt;
         return 1;
     }
     else
+    {
         return 0;
+    }
 }

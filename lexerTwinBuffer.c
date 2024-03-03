@@ -3,14 +3,12 @@
 #include "lexerDef.h"
 #endif
 
-char nextChar(twinBuffer B)
-{
-    return *(advance(B)->forward);
-}
-
 twinBuffer initBuffer(char *filename)
 {
     twinBuffer B = (twinBuffer)malloc(sizeof(struct twinBuffer));
+
+    if (!B)
+        return NULL;
 
     B->beginBufferNo = 0;
     B->begin = B->buffer[B->beginBufferNo];
@@ -19,10 +17,20 @@ twinBuffer initBuffer(char *filename)
     B->forward = B->buffer[B->forwardBufferNo] + BUFLEN - 1;
 
     B->lineNo = 1;
-
     B->fp = fopen(filename, "ab");
 
+    if (B->fp == NULL)
+    {
+        free(B);
+        return NULL;
+    }
+
     return B;
+}
+
+char nextChar(twinBuffer B)
+{
+    return *(advance(B)->forward);
 }
 
 twinBuffer reload(twinBuffer B)
@@ -61,7 +69,7 @@ twinBuffer retract(twinBuffer B)
     }
     else
     {
-        B->forward = B->forward--;
+        B->forward--;
     }
 
     B->retractions++;
@@ -74,6 +82,7 @@ twinBuffer retract(twinBuffer B)
 twinBuffer resetBegin(twinBuffer B)
 {
     B = advance(B);
+
     B->begin = B->forward;
     B->beginBufferNo = B->forwardBufferNo;
 
@@ -82,45 +91,26 @@ twinBuffer resetBegin(twinBuffer B)
 
 char *getLexeme(twinBuffer B)
 {
-    int lexLength = 0;
-    if(B->beginBufferNo == B->forwardBufferNo) 
+    int lexLength;
+    if (B->beginBufferNo == B->forwardBufferNo)
     {
         lexLength = B->forward - B->begin;
-        char* lexeme = (char *) malloc(sizeof(char) * (lexLength + 1));
-
-        int i = 0;
-        while(i < lexLength) {
-            lexeme[i] = *(B->begin + i);
-            i++;
-        }
-
-        lexeme[lexLength] = '\0';
-
-        return lexeme;
-    } 
-    else 
-    {
-        int lexLength1 = B->buffer[B->beginBufferNo] + BUFLEN - 1 - B->begin;
-        int lexLength2 = B->forward - B->buffer[B->forwardBufferNo];
-
-        char* lexeme = (char *) malloc(sizeof(char) * (lexLength1 + lexLength2 + 1));
-
-        int i = 0, j = 0;
-
-        while(i < lexLength1) 
-        {
-            lexeme[i] = *(B->begin + i);
-            i++;
-        }
-
-        while(j < lexLength2)
-        {
-            lexeme[lexLength1 + j] = *(B->buffer[B->forwardBufferNo] + j);
-            j++;
-        } 
-
-        lexeme[lexLength1 + lexLength2] = '\0';
-        
-        return lexeme;
     }
+    else
+    {
+        lexLength = B->buffer[B->beginBufferNo] + BUFLEN - B->begin + B->forward - B->buffer[B->forwardBufferNo];
+    }
+
+    char *lexeme = (char *)malloc(sizeof(char) * (lexLength + 1));
+
+    if (!lexeme)
+        return NULL;
+
+    char *ptr = lexeme;
+    for (char *ch = B->begin; ch != B->forward; ch++)
+        *ptr++ = *ch;
+
+    *ptr = '\0';
+
+    return lexeme;
 }

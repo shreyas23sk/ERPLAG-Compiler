@@ -1,6 +1,9 @@
-#define BUFLEN 2048
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define BUFLEN 2048
+
 enum TOKEN
 {
     TK_COMMENT,
@@ -61,25 +64,18 @@ enum TOKEN
     TK_OR,
     TK_PARAMETER
 };
-
 typedef enum TOKEN token;
-const char *tokenToString(token);
-token stringToToken(char *);
-
 
 struct twinBuffer
 {
     FILE *fp;
     char buffer[2][BUFLEN];
-    char *begin;
-    char *forward;
+    char *forward, *begin;
     int forwardBufferNo, beginBufferNo;
     int retractions;
     int lineNo;
 };
-
 typedef struct twinBuffer *twinBuffer;
-
 
 struct pairLexemeToken
 {
@@ -88,14 +84,14 @@ struct pairLexemeToken
 };
 typedef struct pairLexemeToken *pairLexemeToken;
 
-struct tokenInfo 
+struct tokenInfo
 {
     pairLexemeToken plt;
     int lineNo;
     int isNumber; // 0 for no, 1 for TK_NUM, 2 for TK_REAL
-    char* valueIfNumber; 
+    char *valueIfNumber;
 };
-typedef struct tokenInfo* tokenInfo;
+typedef struct tokenInfo *tokenInfo;
 
 struct hashTable
 {
@@ -104,13 +100,17 @@ struct hashTable
 };
 typedef struct hashTable *hashTable;
 
-pairLexemeToken createPairLexemeToken(char *, token);
+token stringToToken(char *);
+const char *tokenToString(token);
+
+pairLexemeToken createPairLexemeToken(const char *, token);
+
 tokenInfo createTokenInfo(pairLexemeToken plt, twinBuffer B);
 
 hashTable createEmptyHashTable();
-int lookup(hashTable, char *);          // return -1 if string s not found, else return index of entry
-int insert(hashTable, pairLexemeToken); // returns 1 if new pair successfully inserted, 0 if entry already present
-
+int lookup(hashTable, const char *); // return -1 if string s not found, else return index of entry
+int insert(hashTable, const char *, token);
+int insertInTable(hashTable, pairLexemeToken); // returns 1 if new pair successfully inserted, 0 if entry already present
 
 twinBuffer initBuffer(char *);
 char nextChar(twinBuffer);
