@@ -64,5 +64,5 @@ ParseNodePtr peek(StackPtr stack)
 
 int isEmpty(StackPtr stack)
 {
-    return (stack == NULL || stack->top == NULL);
+    return (stack->top == NULL);
 }

@@ -137,9 +137,6 @@ NT stringToNT(char *str)
     else if (!strcmp(str, "var"))
         return var;
 
-    else if (!strcmp(str, "afterNotBooleanExpression"))
-        return afterNotBooleanExpression;
-
     else if (!strcmp(str, "booleanExpression"))
         return booleanExpression;
 
@@ -312,9 +309,6 @@ const char *NTtoString(NT nt)
 
     case var:
         return "var";
-
-    case afterNotBooleanExpression:
-        return "afterNotBooleanExpression";
 
     case booleanExpression:
         return "booleanExpression";

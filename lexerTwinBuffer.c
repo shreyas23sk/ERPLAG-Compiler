@@ -102,13 +102,14 @@ char *getLexeme(twinBuffer B)
     if(B->beginBufferNo == B->forwardBufferNo) 
     {
         lexLength = B->forward - B->begin + 1;
-        char* lexeme = (char *) malloc(sizeof(char) * (lexLength));
+        char* lexeme = (char *) malloc(sizeof(char) * (lexLength + 1));
         
         int i = 0;
         while(i < lexLength) {
             lexeme[i] = *(B->begin + i);
             i++;
         }
+        lexeme[lexLength] = '\0';
 
         return lexeme;
     } 

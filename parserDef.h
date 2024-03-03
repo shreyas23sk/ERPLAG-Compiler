@@ -44,7 +44,6 @@ typedef enum
     factor,
     termPrime,
     var,
-    afterNotBooleanExpression,
     booleanExpression,
     not,
     singleOrRecId,

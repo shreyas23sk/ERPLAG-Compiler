@@ -110,7 +110,9 @@ token getTokenCode(char *lex)
 /// @brief Create token information for an accepted state
 tokenInfo acceptState(token tk, twinBuffer B)
 {
-    tokenInfo result = createTokenInfo(createPairLexemeToken(getLexeme(B), tk), B);
+    char* lex = getLexeme(B);
+    tokenInfo result = createTokenInfo(createPairLexemeToken(lex, tk), B);
+    printf("%s %s\n", lex, tokenToString(tk));
     resetBegin(B);
     return result;
 }
@@ -209,7 +211,7 @@ tokenInfo getNextToken()
     {
         char c = nextChar(B);
         
-        //printf("Char - %c State - %d\n", c, state);
+        // printf("Char - %c State - %d\n", c, state);
         // DFA Transitions
         if(state == 0 && (c == ' ' || c == '\n' || c == '\t')) 
         {
@@ -217,6 +219,12 @@ tokenInfo getNextToken()
             resetBegin(B);
             continue;
         }
+
+        if(c == EOF) 
+        {
+            return NULL;
+        }
+
         MOVE_IF(0, 19, isSymbol(c));
 
         MOVE_IF(0, 16, EQ('@'));
@@ -248,7 +256,7 @@ tokenInfo getNextToken()
 
         MOVE_IF(0, 23, isVarAlpha(c));
         MOVE_IF(23, 24, isVarDigit(c));
-        MOVE_IF(23, 26, isAlpha(c));
+        MOVE_IF(23, 27, isAlpha(c));
         MOVE(23, 28);
         MOVE_IF(24, 24, isVarAlpha(c));
         MOVE_IF(24, 25, isVarDigit(c));
@@ -332,7 +340,10 @@ tokenInfo getNextToken()
         }
 
         CASE(4)
-        return acceptState(TK_ASSIGNOP, B);
+        {
+            retract(B);
+            return acceptState(TK_ASSIGNOP, B);
+        }
 
         CASE(26)
         {
@@ -389,17 +400,3 @@ tokenInfo getNextToken()
     }
 }
 
-
-int main() { 
-    removeComments("testcase.txt", "final.txt");
-    initLexer("final.txt");
-    tokenInfo test = getNextToken();
-    printf("%s %s\n", test->plt->lexeme, tokenToString(test->plt->val));
-    int j = 0;
-    while(j < 120) {
-        test = getNextToken();
-        if(test == NULL) break;
-        printf("%d %s %s\n", test->lineNo, test->plt->lexeme, tokenToString(test->plt->val));
-        j++;
-    }
-}

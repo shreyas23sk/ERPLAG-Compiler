@@ -13,7 +13,7 @@
 #define NO_OF_RULES 96
 #define MAX_SIZE_OF_TNT 26
 #define NO_OF_TERMS 57
-#define NO_OF_NONTERMS 56
+#define NO_OF_NONTERMS 55
 
 typedef struct
 {
@@ -24,10 +24,16 @@ typedef struct
 } TKSET;
 typedef TKSET *tokenSet;
 
+void printSYM(SYM s) 
+{
+    if(s.type == TERM) printf("%s\n", tokenToString(s.tk));
+    else printf("%s\n", NTtoString(s.nt));
+}
+
 LinkedListPtr *grammar;
 tokenSet firstSet[NO_OF_NONTERMS];
 tokenSet followSet[NO_OF_NONTERMS];
-int LLParseTable[NO_OF_NONTERMS][NO_OF_TERMS] = {{-1}};
+int LLParseTable[NO_OF_NONTERMS][NO_OF_TERMS + 1] = {{-1}}; // +1 for EPSILON
 
 void printTokenSet(tokenSet ts)
 {
@@ -69,21 +75,18 @@ tokenSet unionTokenSet(tokenSet A, tokenSet B, int withEpsilon)
 
     if (noOfTokensToBeAddedToA > 0)
     {
-
-        if (A->size != 0)
-            A->set = (token *)realloc(A->set, totalSize);
-        else
-            A->set = (token *)malloc(sizeof(token) * totalSize);
+        token* temp = (token *) malloc(sizeof(token) * totalSize);
 
         int j = 0;
         for (int i = 0; i < NO_OF_TERMS; i++)
         {
-            if (~inSetA[i] & inSetB[i])
+            if (~inSetA[i] & inSetB[i] || inSetA[i])
             {
-                A->set[A->size + (j++)] = i;
+                temp[j++] = i;
             }
         }
 
+        A->set = temp;
         A->size = totalSize;
     }
 
@@ -225,23 +228,25 @@ tokenSet computeFirstList(NodePtr rhs)
     tokenSet temp = (tokenSet)malloc(sizeof(TKSET));
     temp->size = 0;
     temp->endOfInput = 0;
-    temp->eps = 0;
+    temp->eps = 1;
 
     while (rhs != NULL)
-    {
+    {   
         if (rhs->data.type == NONTERM && firstSet[rhs->data.nt]->eps == 1)
-        {
-            temp = unionTokenSet(temp, firstSet[rhs->data.nt], 0);
+        {   
+            temp = unionTokenSet(temp, firstSet[rhs->data.nt], 1);
             rhs = rhs->next;
         }
         else if (rhs->data.type == TERM)
         {
-            temp = unionTokenSet(temp, first(rhs->data), 1);
+            temp = unionTokenSet(temp, first(rhs->data), 0);
+            temp->eps = 0;
             break;
         }
         else
         {
             temp = unionTokenSet(temp, firstSet[rhs->data.nt], 0);
+            temp->eps = 0;
             break;
         }
     }
@@ -280,15 +285,16 @@ void computeFirst()
 
     while (j == 0 || !isEqual(firstSetOld, firstSet))
     {
-        j = 1;
+        j++;
         deepCopy(firstSetOld, firstSet);
+        printf("%d\n", j);
         for (int i = 0; i < NO_OF_RULES; i++)
-        {
+        {   
             LinkedListPtr pi = grammar[i];
-            firstSet[pi->head->data.nt] = unionTokenSet(firstSet[pi->head->data.nt], computeFirstList(pi->head->next), 1);
+            tokenSet temp = computeFirstList(pi->head->next);
+            firstSet[pi->head->data.nt] = unionTokenSet(firstSet[pi->head->data.nt], temp, 1);
         }
     }
-
     /*
     for(int i = 0; i < NO_OF_NONTERMS; i++) {
         printf("%s :- ", NTtoString(i));
@@ -318,13 +324,13 @@ void computeFollow()
                 if (data.type == NONTERM)
                 {
                     followSet[data.nt] = unionTokenSet(followSet[data.nt], firstOfRemainingList, 0);
+                
+                    if (firstOfRemainingList->eps == 1)
+                    {
+                        followSet[data.nt] = unionTokenSet(followSet[data.nt], followSet[grammar[i]->head->data.nt], 1);
+                    }
                 }
-
-                if (firstOfRemainingList->eps == 1)
-                {
-                    followSet[data.nt] = unionTokenSet(followSet[data.nt], followSet[grammar[i]->head->data.nt], 1);
-                }
-
+                
                 rhs = rhs->next;
             }
         }
@@ -384,7 +390,6 @@ void computeFirstAndFollow()
         tokenSet s = computePredict(grammar[i]);
 
         NT nt = grammar[i]->head->data.nt;
-
         for (int j = 0; j < s->size; j++)
         {
             if (LLParseTable[nt][s->set[j]] != -1)
@@ -393,6 +398,11 @@ void computeFirstAndFollow()
             }
             LLParseTable[nt][s->set[j]] = i;
         }
+        /*
+        if(grammar[i]->head->next->data.type == NONTERM && grammar[i]->head->next->data.nt == EPSILON) 
+        {
+            //LLParseTable[nt][NO_OF_TERMS] = i;
+        } */
     }
 
     printf("%d\n", isLL1);
@@ -413,28 +423,28 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
 
     while (!isEmpty(stack))
     {
+        printf("Current top element :- "); printSYM(X);
         if ((X.type == TERM && X.tk == a->plt->val))
         {
+            printf("found match at line no :- %d ", a->lineNo); printSYM(X);
             pop(stack);
             a = getNextToken();
         }
         else if (X.type == NONTERM && X.nt == EPSILON)
         {
             pop(stack);
+            printf("popped for epsilon \n");
         }
         else if (X.type == TERM)
         {
-            printf("Encountered error during parsing!\n");
+            printf("Encountered error during parsing - non matching tokens!\n");
+            printSYM(X);
             break;
         }
-        else if (LLParseTable[X.nt][a->plt->val] < 0)
-        {
-            printf("Encountered error during parsing!\n");
-            break;
-        }
-        else
+        else if (LLParseTable[X.nt][a->plt->val] >= 0)
         {
             LinkedListPtr production = grammar[LLParseTable[X.nt][a->plt->val]];
+            
             printList(production);
 
             ParseNodePtr top = pop(stack);
@@ -445,14 +455,28 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
             }
 
             NodePtr derivation = production->tail;
-            while (derivation->prev != production->head)
+            while (derivation != production->head)
             {
+                printSYM(derivation->data);
                 ParseNodePtr newNode = createParseNode(derivation->data);
                 push(stack, newNode);
                 addChild(top, newNode);
                 derivation = derivation->prev;
             }
+            
+        }  
+        else if (LLParseTable[X.nt][NO_OF_TERMS] >= 0) // X -> EPSILON case
+        {
+            pop(stack);
         }
+        else
+        {
+            printf("%d, %s %s %d\n",a->lineNo, NTtoString(X.nt), tokenToString(a->plt->val), LLParseTable[X.nt][a->plt->val]);
+            printf("Encountered error during parsing!\n");
+            printTokenSet(firstSet[X.nt]);
+            break;
+        }
+        printf("%d\n", isEmpty(stack));
         X = peek(stack)->val;
     }
 
@@ -470,4 +494,6 @@ int main()
     } */
 
     computeFirstAndFollow();
+    printTokenSet(firstSet[stmts]);
+    parseInputSourceCode("final.txt");
 }
