@@ -255,6 +255,10 @@ tokenInfo getNextToken()
         MOVE_IF(44, 44, isAlpha(c));
         MOVE(44, 45);
 
+        MOVE_IF(0, 20, c == '%')
+        MOVE_IF(0, 50, c == '\n');
+      
+
         // DFA Returns
         CASE(19)
         return acceptState(getTokenCode(lex), B);
@@ -341,5 +345,45 @@ tokenInfo getNextToken()
             retract(B);
             return acceptState(TK_RUID, B);
         }
+      
+
+        CASE(20)
+        {
+            return acceptState(TK_COMMENT, B);
+        }
+
+        CASE(50)
+        {
+            // INCREMENT THE LINE BUFFER
+            B->lineNo++;
+            MOVE(50, 0);
+        }
     }
+}
+
+
+void removeComments(char *fileName, char *outputFileName)
+{
+    FILE *fp = fopen(fileName, "r");
+    FILE *fp2 = fopen(outputFileName, "w");
+    char c;
+    int k = 0;
+
+    while ((c = fgetc(fp)) != EOF)
+    {
+        if (c == '%')
+        {
+            k = 1;
+        }
+        else if (c == '\n')
+        {
+            k = 0;
+        }
+        if (k == 0)
+        {
+            fputc(c, fp2);
+        }
+    }
+    fclose(fp);
+    fclose(fp2);
 }

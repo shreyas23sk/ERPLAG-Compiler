@@ -3,6 +3,11 @@
 #include "parserDef.h"
 #endif
 
+#ifndef PARSER
+#define PARSER
+#include "parser.h"
+#endif
+
 #include "lexer.h"
 
 #define NO_OF_RULES 96
