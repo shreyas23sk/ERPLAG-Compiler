@@ -1,6 +1,6 @@
-#ifndef PARSERDEF
-#define PARSERDEF
-#include "parserDef.h"
+#ifndef LEXERDEF
+#define LEXERDEF
+#include "lexerDef.h"
 #endif
 
 token stringToToken(char *str)

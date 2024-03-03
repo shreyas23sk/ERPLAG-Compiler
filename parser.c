@@ -411,7 +411,7 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
     tokenInfo a = getNextToken();
     SYM X = (peek(stack))->val;
 
-    while (X.tk != -1)
+    while (!isEmpty(stack))
     {
         if ((X.type == TERM && X.tk == a->plt->val))
         {

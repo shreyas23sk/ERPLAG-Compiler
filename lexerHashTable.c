@@ -7,18 +7,15 @@ hashTable createHashTable()
 {
     hashTable newTable = (hashTable)malloc(sizeof(struct hashTable));
 
-    if (!newTable == NULL)
-        return NULL;
-
     newTable->size = 0;
     newTable->items = NULL;
 
     return newTable;
 }
 
-int lookup(hashTable ht, const char *s)
+int lookup(hashTable ht, char *s)
 {
-    if (!ht || ht->size == 0)
+    if (ht->size == 0)
         return -1;
 
     for (int i = 0; i < ht->size; i++)

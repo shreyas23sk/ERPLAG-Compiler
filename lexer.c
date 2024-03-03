@@ -21,7 +21,6 @@
     if (state == INITIAL)    \
     {                        \
         state = FINAL;       \
-        continue;            \
     }
 
 /// @brief Check if the state is equal to s
@@ -82,22 +81,14 @@ void initLexer(char *testCaseFileName)
     insert(ht, "record", TK_RECORD);
     insert(ht, "endrecord", TK_ENDRECORD);
     insert(ht, "else", TK_ELSE);
-    insert(ht, "&&&", TK_AND);
-    insert(ht, "@@@", TK_OR);
     insert(ht, "~", TK_NOT);
-    insert(ht, "<", TK_LT);
-    insert(ht, "<=", TK_LE);
     insert(ht, "==", TK_EQ);
-    insert(ht, ">", TK_GT);
-    insert(ht, ">=", TK_GE);
-    insert(ht, "!=", TK_NE);
 }
 
 /// @brief Get the token code for the given lexeme
 token getTokenCode(char *lex)
 {
     int ind = lookup(ht, lex);
-
     if (ind == -1)
     {
         switch (lex[0])
@@ -119,13 +110,15 @@ token getTokenCode(char *lex)
 /// @brief Create token information for an accepted state
 tokenInfo acceptState(token tk, twinBuffer B)
 {
-    return createTokenInfo(createPairLexemeToken(getLexeme(B), tk), B);
+    tokenInfo result = createTokenInfo(createPairLexemeToken(getLexeme(B), tk), B);
+    resetBegin(B);
+    return result;
 }
 
 /// @brief Remove comments from the input file
-void removeComments(char *fileName, char *outputFileName)
+void removeComments(char *inputFileName, char *outputFileName)
 {
-    FILE *fp = fopen(fileName, "r");
+    FILE *fp = fopen(inputFileName, "r");
     FILE *fp2 = fopen(outputFileName, "w");
 
     if (!fp || !fp2)
@@ -153,7 +146,9 @@ void removeComments(char *fileName, char *outputFileName)
 /// @brief Check if the input is a symbol
 int isSymbol(char c)
 {
-    return lookup(ht, &c) != -1;
+    char s[1];
+    s[0] = c;
+    return lookup(ht, s) != -1;
 }
 
 /// @brief Check if the input is an alphabet
@@ -213,12 +208,21 @@ tokenInfo getNextToken()
     while (1)
     {
         char c = nextChar(B);
-
+        
+        //printf("Char - %c State - %d\n", c, state);
         // DFA Transitions
+        if(state == 0 && (c == ' ' || c == '\n' || c == '\t')) 
+        {
+            if(c == '\n') B->lineNo++;
+            resetBegin(B);
+            continue;
+        }
         MOVE_IF(0, 19, isSymbol(c));
 
         MOVE_IF(0, 16, EQ('@'));
         MOVE_IF(16, 17, EQ('@'));
+        if(state == 16)
+            printf("Unknown Pattern:- %s\n", getLexeme(B));
         MOVE_IF(17, 18, EQ('@'));
 
         MOVE_IF(0, 13, EQ('&'));
@@ -268,9 +272,9 @@ tokenInfo getNextToken()
         MOVE_IF(33, 34, EQ('+') || EQ('-'));
         MOVE_IF(33, 35, isDigit(c));
         MOVE_IF(34, 35, isDigit(c));
-        MOVE_IF(35, 36, isDigit(c));
+        MOVE(35, 36);
 
-        MOVE_IF(0, 39, EQ('-'));
+        MOVE_IF(0, 39, EQ('_'));
         MOVE_IF(39, 40, isAllAlpha(c));
         MOVE_IF(40, 40, isAllAlpha(c));
         MOVE_IF(40, 41, isDigit(c));
@@ -285,10 +289,13 @@ tokenInfo getNextToken()
 
         MOVE_IF(0, 20, EQ('%'));
         MOVE_IF(0, 50, EQ('\n'));
-
+        
         // DFA Returns
         CASE(19)
-        return acceptState(getTokenCode(lex), B);
+        {
+            retract(B);
+            return acceptState(getTokenCode(getLexeme(B)), B);
+        }
 
         CASE(18)
         return acceptState(TK_OR, B);
@@ -336,7 +343,7 @@ tokenInfo getNextToken()
         CASE(28)
         {
             retract(B);
-            return acceptState(getTokenCode(lex), B);
+            return acceptState(getTokenCode(getLexeme(B)), B);
         }
 
         CASE(37)
@@ -364,7 +371,7 @@ tokenInfo getNextToken()
         CASE(42)
         {
             retract(B);
-            return acceptState(getTokenCode(lex), B);
+            return acceptState(getTokenCode(getLexeme(B)), B);
         }
 
         CASE(45)
@@ -378,11 +385,21 @@ tokenInfo getNextToken()
             return acceptState(TK_COMMENT, B);
         }
 
-        CASE(50)
-        {
-            // INCREMENT THE LINE BUFFER
-            B->lineNo++;
-            MOVE(50, 0);
-        }
+
+    }
+}
+
+
+int main() { 
+    removeComments("testcase.txt", "final.txt");
+    initLexer("final.txt");
+    tokenInfo test = getNextToken();
+    printf("%s %s\n", test->plt->lexeme, tokenToString(test->plt->val));
+    int j = 0;
+    while(j < 120) {
+        test = getNextToken();
+        if(test == NULL) break;
+        printf("%d %s %s\n", test->lineNo, test->plt->lexeme, tokenToString(test->plt->val));
+        j++;
     }
 }

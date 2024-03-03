@@ -22,6 +22,7 @@ tokenInfo createTokenInfo(pairLexemeToken plt, twinBuffer B)
         ti->isNumber = 0;
         ti->valueIfNumber = NULL;
     }
-
+    
+    ti->lineNo = B->lineNo;
     return ti;
 }
