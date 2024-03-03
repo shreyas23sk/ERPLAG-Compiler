@@ -2,10 +2,7 @@
 #define PARSERDEF
 #include "parserDef.h"
 #endif
-#ifndef LEXER
-#define LEXER
 #include "lexer.h"
-#endif
 
 #define NO_OF_RULES 96
 #define MAX_SIZE_OF_TNT 26
