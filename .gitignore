@@ -10,6 +10,7 @@ Code/testcases/
 *.out
 *.pdf
 *.o
+main
 
 # Ignore misc types
 *copy*

@@ -3,7 +3,7 @@
 #include "lexerDef.h"
 #endif
 
-hashTable createEmptyHashTable()
+hashTable createHashTable()
 {
     hashTable newTable = (hashTable)malloc(sizeof(struct hashTable));
 

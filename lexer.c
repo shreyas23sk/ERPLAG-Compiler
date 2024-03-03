@@ -29,7 +29,7 @@ hashTable ht;
 // Initialize the lexer and populate the hashmap
 void initLexer()
 {
-    ht = createEmptyHashTable();
+    ht = createHashTable();
 
     // Populate the hashmap
     insert(ht, "with", TK_WITH);

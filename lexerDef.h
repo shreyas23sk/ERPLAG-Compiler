@@ -107,7 +107,7 @@ pairLexemeToken createPairLexemeToken(const char *, token);
 
 tokenInfo createTokenInfo(pairLexemeToken plt, twinBuffer B);
 
-hashTable createEmptyHashTable();
+hashTable createHashTable();
 int lookup(hashTable, const char *);
 int insert(hashTable, const char *, token);
 int insertInTable(hashTable, pairLexemeToken);
