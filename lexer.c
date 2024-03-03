@@ -257,6 +257,7 @@ tokenInfo getNextToken()
 
         MOVE_IF(0, 20, c == '%')
         MOVE_IF(0, 50, c == '\n');
+      
 
         // DFA Returns
         CASE(19)
@@ -344,6 +345,7 @@ tokenInfo getNextToken()
             retract(B);
             return acceptState(TK_RUID, B);
         }
+      
 
         CASE(20)
         {
