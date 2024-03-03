@@ -3,94 +3,84 @@
 #include "lexerDef.h"
 #endif
 
-// d, named according to convention for the transition function in DFAs, delta
-// if state is in initState and current character is ch, take state to finState
-#define d(initState, ch, finState)     \
-    if (state == initState && c == ch) \
-    {                                  \
-        state = finState;              \
-        continue;                      \
+// Macro for transition rules in DFAs
+#define TRANSITION(initState, cond, finState) \
+    if (state == initState && (cond))         \
+    {                                         \
+        state = finState;                     \
+        continue;                             \
     }
 
-// for checking if cond is satisfied (use c as char variable as defined in the function)
-#define dr(initState, cond, finState) \
-    if (state == initState && cond)   \
-    {                                 \
-        state = finState;             \
-        continue;                     \
+// Macro for setting state to finState if initState is encountered
+#define DEFAULT(initState, finState) \
+    if (state == initState)          \
+    {                                \
+        state = finState;            \
+        continue;                    \
     }
 
-// catchall case, to be used after all others are covered
-#define dn(initState, finState) \
-    if (state == initState)     \
-    {                           \
-        state = finState;       \
-        continue;               \
-    }
-
-// shorthand for if, for accept states
-#define case_(s) if (state == s)
+// Shorthand for switch-case blocks
+#define CASE(s) if (state == s)
 
 char *filename;
 twinBuffer B;
 hashTable ht;
 
-/// @brief initialize the lexer and populate the hashmap
+/// @brief Initialize the lexer and populate the hashmap
 void initLexer()
 {
-
     ht = createEmptyHashTable();
 
-    // populate the hashmap
-    int k = insert(ht, "with", TK_WITH);         // with
-    k = insert(ht, "parameters", TK_PARAMETERS); // parameters
-    k = insert(ht, "end", TK_END);               // end
-    k = insert(ht, "while", TK_WHILE);           // while
-    k = insert(ht, "union", TK_UNION);           // union
-    k = insert(ht, "endunion", TK_ENDUNION);     // end union
-    k = insert(ht, "definetype", TK_DEFINETYPE); // definetype
-    k = insert(ht, "as", TK_AS);                 // as
-    k = insert(ht, "type", TK_TYPE);             // type
-    k = insert(ht, "_main", TK_MAIN);            // main
-    k = insert(ht, "global", TK_GLOBAL);         // global
-    k = insert(ht, "parameter", TK_PARAMETER);   // parameter
-    k = insert(ht, "list", TK_LIST);             // list
-    k = insert(ht, "[", TK_SQL);                 // left sqr
-    k = insert(ht, "]", TK_SQR);                 // right sqr
-    k = insert(ht, "input", TK_INPUT);           // input
-    k = insert(ht, "output", TK_OUTPUT);         //  output
-    k = insert(ht, "int", TK_INT);               // int
-    k = insert(ht, "real", TK_REAL);             // real
-    k = insert(ht, ",", TK_COMMA);               // comma
-    k = insert(ht, ";", TK_SEM);                 // semicolon
-    k = insert(ht, ":", TK_COLON);               // colon
-    k = insert(ht, ".", TK_DOT);                 // dot
-    k = insert(ht, "endwhile", TK_ENDWHILE);     // endwhile
-    k = insert(ht, "(", TK_OP);                  // (
-    k = insert(ht, ")", TK_CL);                  // )
-    k = insert(ht, "if", TK_IF);                 // if
-    k = insert(ht, "then", TK_THEN);             // then
-    k = insert(ht, "endif", TK_ENDIF);           // endif
-    k = insert(ht, "read", TK_READ);             // read
-    k = insert(ht, "write", TK_WRITE);           // write
-    k = insert(ht, "return", TK_RETURN);         // return
-    k = insert(ht, "+", TK_PLUS);                // plus
-    k = insert(ht, "-", TK_MINUS);               // minus
-    k = insert(ht, "*", TK_MUL);                 // mul
-    k = insert(ht, "/", TK_DIV);                 // div
-    k = insert(ht, "call", TK_CALL);             // call
-    k = insert(ht, "record", TK_RECORD);         // record
-    k = insert(ht, "endrecord", TK_ENDRECORD);   // endrecord
-    k = insert(ht, "else", TK_ELSE);             // else
-    k = insert(ht, "&&&", TK_AND);               // and
-    k = insert(ht, "@@@", TK_OR);                // or
-    k = insert(ht, "~", TK_NOT);                 // not
-    k = insert(ht, "<", TK_LT);                  // less than
-    k = insert(ht, "<=", TK_LE);                 // less than eq to
-    k = insert(ht, "==", TK_EQ);                 // equal to
-    k = insert(ht, ">", TK_GT);                  // greater than
-    k = insert(ht, ">=", TK_GE);                 // greater than eq to
-    k = insert(ht, "!=", TK_NE);                 // not equal
+    // Populate the hashmap
+    insert(ht, "with", TK_WITH);
+    insert(ht, "parameters", TK_PARAMETERS);
+    insert(ht, "end", TK_END);
+    insert(ht, "while", TK_WHILE);
+    insert(ht, "union", TK_UNION);
+    insert(ht, "endunion", TK_ENDUNION);
+    insert(ht, "definetype", TK_DEFINETYPE);
+    insert(ht, "as", TK_AS);
+    insert(ht, "type", TK_TYPE);
+    insert(ht, "_main", TK_MAIN);
+    insert(ht, "global", TK_GLOBAL);
+    insert(ht, "parameter", TK_PARAMETER);
+    insert(ht, "list", TK_LIST);
+    insert(ht, "[", TK_SQL);
+    insert(ht, "]", TK_SQR);
+    insert(ht, "input", TK_INPUT);
+    insert(ht, "output", TK_OUTPUT);
+    insert(ht, "int", TK_INT);
+    insert(ht, "real", TK_REAL);
+    insert(ht, ",", TK_COMMA);
+    insert(ht, ";", TK_SEM);
+    insert(ht, ":", TK_COLON);
+    insert(ht, ".", TK_DOT);
+    insert(ht, "endwhile", TK_ENDWHILE);
+    insert(ht, "(", TK_OP);
+    insert(ht, ")", TK_CL);
+    insert(ht, "if", TK_IF);
+    insert(ht, "then", TK_THEN);
+    insert(ht, "endif", TK_ENDIF);
+    insert(ht, "read", TK_READ);
+    insert(ht, "write", TK_WRITE);
+    insert(ht, "return", TK_RETURN);
+    insert(ht, "+", TK_PLUS);
+    insert(ht, "-", TK_MINUS);
+    insert(ht, "*", TK_MUL);
+    insert(ht, "/", TK_DIV);
+    insert(ht, "call", TK_CALL);
+    insert(ht, "record", TK_RECORD);
+    insert(ht, "endrecord", TK_ENDRECORD);
+    insert(ht, "else", TK_ELSE);
+    insert(ht, "&&&", TK_AND);
+    insert(ht, "@@@", TK_OR);
+    insert(ht, "~", TK_NOT);
+    insert(ht, "<", TK_LT);
+    insert(ht, "<=", TK_LE);
+    insert(ht, "==", TK_EQ);
+    insert(ht, ">", TK_GT);
+    insert(ht, ">=", TK_GE);
+    insert(ht, "!=", TK_NE);
 }
 
 /// @brief gives the token corresponding to string lex
@@ -99,6 +89,7 @@ void initLexer()
 token get_token_code(char *lex)
 {
     int ind = lookup(ht, lex);
+
     if (ind == -1)
     {
         switch (lex[0])
@@ -117,81 +108,70 @@ token get_token_code(char *lex)
     return ht->items[ind]->val;
 }
 
+// Create token information for an accepted state
 tokenInfo acceptState(token tk, twinBuffer B)
 {
     return createTokenInfo(createPairLexemeToken(getLexeme(B), tk), B);
 }
 
-/// @brief returns true if the input is a symbol
+/// @brief Check if the input is a symbol
 int isSym(char c)
 {
-    char cptr[1];
-    cptr[0] = c;
-
-    if (lookup(ht, c) == -1)
-        return 0;
-    else
-        return 1;
+    return lookup(ht, &c) != -1;
 }
 
+/// @brief Get the next token from the input
 tokenInfo getNextToken()
 {
     B = initBuffer(filename);
 
-    int state = 0;
     char *lex;
+    int state = 0;
 
     while (1)
     {
         char c = nextChar(B);
 
-        d(0, '>', 8);
-        d(0, '!', 11);
-        d(8, '=', 9);
-        d(0, '=', 48);
-        d(0, '&', 13);
-        d(0, '@', 16);
+        TRANSITION(0, c == '>', 8);
+        TRANSITION(0, c == '!', 11);
+        TRANSITION(8, c == '=', 9);
+        TRANSITION(0, c == '=', 48);
+        TRANSITION(0, c == '&', 13);
+        TRANSITION(0, c == '@', 16);
+
         if (isSym(c))
-        {
-            d(0, c, 19);
-        }
-        dn(11, 12);
-        dn(8, 10);
-        dn(48, 49);
-        dn(13, 14);
-        dn(14, 15);
-        dn(16, 17);
-        dn(17, 18);
+            TRANSITION(0, 1, 19);
 
-        case_(9)
-        {
-            return acceptState(TK_GE, B);
-        }
+        DEFAULT(11, 12);
+        DEFAULT(8, 10);
+        DEFAULT(48, 49);
+        DEFAULT(13, 14);
+        DEFAULT(14, 15);
+        DEFAULT(16, 17);
+        DEFAULT(17, 18);
 
-        case_(10)
+        CASE(9)
+        return acceptState(TK_GE, B);
+
+        CASE(10)
         {
             retract(B);
             return acceptState(TK_GT, B);
         }
-        case_(12)
-        {
-            return acceptState(TK_NE, B);
-        }
-        case_(15)
-        {
-            return acceptState(TK_AND, B);
-        }
-        case_(18)
-        {
-            return acceptState(TK_OR, B);
-        }
-        case_(19)
-        {
-            return acceptState(get_token_code(lex), B);
-        }
-        case_(49)
-        {
-            return acceptState(TK_EQ, B);
-        }
+
+        CASE(12)
+        return acceptState(TK_NE, B);
+
+        CASE(15)
+        return acceptState(TK_AND, B);
+
+        CASE(18)
+        return acceptState(TK_OR, B);
+
+        CASE(19)
+        return acceptState(get_token_code(lex), B);
+
+        CASE(49)
+        return acceptState(TK_EQ, B);
     }
 }
