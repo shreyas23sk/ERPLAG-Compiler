@@ -25,7 +25,7 @@ otherStmts  stmt otherStmts  | EPSILON
 stmt  assignmentStmt  | iterativeStmt |conditionalStmt |ioStmt | funCallStmt 
 assignmentStmt singleOrRecId  TK_ASSIGNOP arithmeticExpression  TK_SEM
 singleOrRecId TK_ID option_single_constructed
-option_single_constructed oneExpansion moreExpansion
+option_single_constructed oneExpansion moreExpansion | EPSILON 
 oneExpansion TK_DOT TK_FIELDID 
 moreExpansion oneExpansion moreExpansion | EPSILON 
 funCallStmt outputParameters TK_CALL TK_FUNID TK_WITH TK_PARAMETERS inputParameters TK_SEM

@@ -14,6 +14,7 @@
 #define MAX_SIZE_OF_TNT 26
 #define NO_OF_TERMS 57
 #define NO_OF_NONTERMS 55
+#define SYNCH 1
 
 void printSYM(SYM s) 
 {
@@ -25,6 +26,7 @@ LinkedListPtr *grammar;
 tokenSet firstSet[NO_OF_NONTERMS];
 tokenSet followSet[NO_OF_NONTERMS];
 int LLParseTable[NO_OF_NONTERMS][NO_OF_TERMS + 1] = {{-1}}; // +1 for EPSILON
+int synchSet[NO_OF_NONTERMS][NO_OF_TERMS + 1];
 
 void printTokenSet(tokenSet ts)
 {
@@ -389,20 +391,44 @@ void computeFirstAndFollow()
             }
             LLParseTable[nt][s->set[j]] = i;
         }
-        /*
-        if(grammar[i]->head->next->data.type == NONTERM && grammar[i]->head->next->data.nt == EPSILON) 
+        
+        if(grammar[i]->head->next != NULL && grammar[i]->head->next->data.type == NONTERM && grammar[i]->head->next->data.nt == EPSILON) 
         {
             LLParseTable[nt][NO_OF_TERMS] = i;
-        } */
+            printList(grammar[i]);
+        }
+        printf("%d\n", i);
     }
 
-    printf("%d\n", isLL1);
+    printf("hello %d\n", isLL1);
+}
+
+void initSynchSet() 
+{
+    for(int A = 0; A < NO_OF_NONTERMS; A++) 
+    {
+        tokenSet fi = firstSet[A];
+        tokenSet fo = followSet[A];
+        
+        for(int i = 0; i < fi->size; i++) synchSet[A][fi->set[i]] = SYNCH;
+        for(int i = 0; i < fo->size; i++) synchSet[A][fo->set[i]] = SYNCH;
+
+        synchSet[A][TK_SEM] = SYNCH;
+        synchSet[A][TK_ENDRECORD] = SYNCH;
+        synchSet[A][TK_ENDWHILE] = SYNCH;
+        synchSet[A][TK_ENDIF] = SYNCH;
+        synchSet[A][TK_ELSE] = SYNCH;
+        synchSet[A][TK_SQR] = SYNCH;
+        synchSet[A][TK_CL] = SYNCH;
+        synchSet[A][TK_END] = SYNCH;
+    }
 }
 
 ParseTreePtr parseInputSourceCode(char *testCaseFileName)
 {
     removeComments("testcase.txt", testCaseFileName);
     initLexer(testCaseFileName);
+    initSynchSet();
 
     StackPtr stack = createStack();
     push(stack, createParseNode(createSYM(NONTERM, "program")));
@@ -415,25 +441,24 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
 
     while (!isEmpty(stack))
     {
-        printf("Current top element :- "); printSYM(X);
-        if ((X.type == TERM && X.tk == a->plt->val))
+        //printf("Current top element :- "); printSYM(X);
+        if ((X.type == TERM))
         {
-            printf("found match at line no :- %d ", a->lineNo); printSYM(X);
+            if(X.tk == a->plt->val) 
+            {
+                printf("found match at line no :- %d ", a->lineNo); printSYM(X);
+                a = getNextToken();
+            } 
+            else 
+            {
+                printf("Line no %d : The token %s for lexeme %s does not match the expected token %s\n", a->lineNo, tokenToString(a->plt->val), a->plt->lexeme, tokenToString(X.tk));
+            }
             pop(stack);
-            if(!isEmpty(stack)) a = getNextToken();
-            else break;
         }
         else if (X.type == NONTERM && X.nt == EPSILON)
         {
             pop(stack);
             printf("popped for epsilon \n");
-        }
-        else if (X.type == TERM)
-        {
-            printf("Encountered error during parsing - non matching tokens!\n");
-            printSYM(X);
-            printList(grammar[LLParseTable[fieldDefinitions][TK_RUID]]);
-            break;
         }
         else if (LLParseTable[X.nt][a->plt->val] >= 0)
         {
@@ -451,7 +476,7 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
             NodePtr derivation = production->tail;
             while (derivation != production->head)
             {
-                printSYM(derivation->data);
+                //printSYM(derivation->data);
                 ParseNodePtr newNode = createParseNode(derivation->data);
                 push(stack, newNode);
                 addChild(top, newNode);
@@ -459,16 +484,23 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
             }
             
         }  
-        else if (LLParseTable[X.nt][NO_OF_TERMS] >= 0) // X -> EPSILON case
-        {
-            pop(stack);
-        }
         else
         {
-            printf("%d, %s %s %d\n",a->lineNo, NTtoString(X.nt), tokenToString(a->plt->val), LLParseTable[X.nt][a->plt->val]);
-            printf("Encountered error during parsing!\n");
-            printTokenSet(firstSet[X.nt]);
-            break;
+            int j = 0;
+            printf("Line no %d: Invalid token %s encountered with value %s stack top %s\n", a->lineNo, tokenToString(a->plt->val), a->plt->lexeme, NTtoString(X.nt));
+            while(1) 
+            {
+                j++;
+                printf("%s %s %d\n", NTtoString(X.nt), tokenToString(a->plt->val), synchSet[X.nt][a->plt->val]);
+                a = getNextToken();
+                if(synchSet[X.nt][a->plt->val])
+                {
+                    pop(stack);
+                    printf("hello\n");
+                    break;
+                }
+            } 
+            if(j == 10) break;
         }
         printf("%d\n", isEmpty(stack));
         X = peek(stack)->val;
@@ -488,6 +520,6 @@ int main()
     } */
 
     computeFirstAndFollow();
-    printTokenSet(firstSet[stmts]);
+    //printTokenSet(firstSet[stmts]);
     parseInputSourceCode("final.txt");
 }
