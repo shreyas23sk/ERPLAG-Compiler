@@ -356,6 +356,6 @@ const char *tokenToString(token t)
         return "TK_SQR";
 
     default:
-        return "<unknown>";
+        return "TK_ERROR";
     }
 }

@@ -93,6 +93,8 @@ typedef LinkedList *LinkedListPtr;
 typedef struct ParseNode
 {
     SYM val;
+    int lineNo;
+    char* lex;
     struct ParseNode **children;
     int noOfChildren;
 } ParseNode;
@@ -143,7 +145,7 @@ ParseNodePtr peek(StackPtr stack);
 int isEmpty(StackPtr stack);
 
 ParseTreePtr createParseTree();
-ParseNodePtr createParseNode(SYM value);
+ParseNodePtr createParseNode(SYM value, int lineNo, char* lex);
 void addChild(ParseNodePtr parent, ParseNodePtr child);
-void printParseTreeHelper(ParseNodePtr node, int depth);
-void printParseTree(ParseTreePtr tree);
+void printParseTreeHelper(ParseNodePtr node, ParseNodePtr parent, FILE *fp);
+void printParseTree(ParseTreePtr tree, char* outFile);

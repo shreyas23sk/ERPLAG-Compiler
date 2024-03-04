@@ -27,14 +27,15 @@
 #define EQ(x) (c == x)
 
 /// @brief Check if the state is equal to s
-#define CASE(s) if (state == s)
+#define CASE(s) if (state == s) 
 
 /// @brief Throw an error for unknown pattern
 #define ERROR(i)           \
     if (state == i)        \
     {                      \
-        printf("Error\n"); \
-        return NULL;       \
+        printf("Lexical Error found at %d\n", B->lineNo); \
+        retract(B); \
+        return acceptState(TK_ERROR, B);       \
     }
 
 char *fileName;
@@ -119,8 +120,19 @@ token getTokenCode(char *lex)
 tokenInfo acceptState(token tk, twinBuffer B)
 {
     char* lex = getLexeme(B);
-    tokenInfo result = createTokenInfo(createPairLexemeToken(lex, tk), B);
-    printf("%s %s\n", lex, tokenToString(tk));
+    int lenCheck = (strlen(lex) <= 20);
+    tokenInfo result;
+    
+    if(tk == TK_FIELDID || tk == TK_ID || tk == TK_RUID)
+    {
+        if(!lenCheck) result = createTokenInfo(createPairLexemeToken(lex, TK_ERROR), B);
+        else result = createTokenInfo(createPairLexemeToken(lex, tk), B);
+    } 
+    else 
+    {
+        result = createTokenInfo(createPairLexemeToken(lex, tk), B);
+    }
+    printf("Line no %d :- Token returned :- %s %s\n", B->lineNo, lex, tokenToString(tk));
     resetBegin(B);
     return result;
 }
@@ -227,7 +239,7 @@ tokenInfo getNextToken()
         // printf("Char - %c State - %d\n", c, state);
 
         //  DFA Transitions
-        if (state == 0 && (c == ' ' || c == '\n' || c == '\t'))
+        if (state == 0 && (c == ' ' || c == '\n' || c == '\t' || c == '\r'))
         {
             if (c == '\n')
                 B->lineNo++;
@@ -309,6 +321,7 @@ tokenInfo getNextToken()
         MOVE_IF(0, 50, EQ('\n'));
 
         // DFA Returns
+
         CASE(19)
         {
             retract(B);
@@ -320,19 +333,16 @@ tokenInfo getNextToken()
 
         CASE(15)
         {
-            retract(B);
             return acceptState(TK_AND, B);
         }
 
         CASE(49)
         {
-            retract(B);
             return acceptState(TK_EQ, B);
         }
 
         CASE(12)
         {
-            retract(B);
             return acceptState(TK_NE, B);
         }
         CASE(9)
@@ -413,6 +423,14 @@ tokenInfo getNextToken()
         {
             return acceptState(TK_COMMENT, B);
         }
+        
+        if(c == '\0')
+        {
+            return acceptState(TK_EOF, B);
+        }
+
+        if (B->begin != B->forward) retract(B);
+        return acceptState(TK_ERROR, B);
     }
 }
 /*

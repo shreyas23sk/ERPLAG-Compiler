@@ -9,6 +9,12 @@ twinBuffer initBuffer(char *filename)
 
     if (!B)
         return NULL;
+    
+    for(int i = 0; i < BUFLEN; i++) 
+    {
+        B->buffer[0][i] = '\0';
+        B->buffer[1][i] = '\0';
+    }
 
     B->beginBufferNo = 0;
     B->begin = B->buffer[B->beginBufferNo];
@@ -31,6 +37,10 @@ char nextChar(twinBuffer B)
 
 twinBuffer reload(twinBuffer B)
 {
+    for(int i = 0; i < BUFLEN; i++) 
+    {
+        B->buffer[B->forwardBufferNo][i] = '\0';
+    }
     fread(B->buffer[B->forwardBufferNo], sizeof(char), BUFLEN, B->fp);
     return B;
 }

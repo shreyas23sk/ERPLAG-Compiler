@@ -395,12 +395,9 @@ void computeFirstAndFollow()
         if(grammar[i]->head->next != NULL && grammar[i]->head->next->data.type == NONTERM && grammar[i]->head->next->data.nt == EPSILON) 
         {
             LLParseTable[nt][NO_OF_TERMS] = i;
-            printList(grammar[i]);
         }
-        printf("%d\n", i);
     }
 
-    printf("hello %d\n", isLL1);
 }
 
 void initSynchSet() 
@@ -420,7 +417,6 @@ void initSynchSet()
         synchSet[A][TK_ELSE] = SYNCH;
         synchSet[A][TK_SQR] = SYNCH;
         synchSet[A][TK_CL] = SYNCH;
-        synchSet[A][TK_END] = SYNCH;
     }
 }
 
@@ -430,8 +426,10 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
     initLexer(testCaseFileName);
     initSynchSet();
 
+    FILE* efp = fopen("errors.txt", "w+");
+
     StackPtr stack = createStack();
-    push(stack, createParseNode(createSYM(NONTERM, "program")));
+    push(stack, createParseNode(createSYM(NONTERM, "program"), 0, NULL));
 
     ParseTreePtr result = createParseTree();
 
@@ -441,30 +439,38 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
 
     while (!isEmpty(stack))
     {
+        if(a->plt->val == TK_EOF) break;
+        
         //printf("Current top element :- "); printSYM(X);
+        if(a->plt->val == TK_ERROR)
+        {
+                fprintf(efp, "Line No %d :- Unknown pattern %s\n", a->lineNo, a->plt->lexeme);
+                a = getNextToken();
+                // if(a->lineNo == 28) break;
+        }
         if ((X.type == TERM))
         {
+            
             if(X.tk == a->plt->val) 
             {
-                printf("found match at line no :- %d ", a->lineNo); printSYM(X);
+                // printf("found match at line no :- %d ", a->lineNo); printSYM(X);
                 a = getNextToken();
             } 
             else 
             {
-                printf("Line no %d : The token %s for lexeme %s does not match the expected token %s\n", a->lineNo, tokenToString(a->plt->val), a->plt->lexeme, tokenToString(X.tk));
+                fprintf(efp, "Line no %d : The token %s for lexeme %s does not match the expected token %s\n", a->lineNo, tokenToString(a->plt->val), a->plt->lexeme, tokenToString(X.tk));
             }
             pop(stack);
         }
         else if (X.type == NONTERM && X.nt == EPSILON)
         {
             pop(stack);
-            printf("popped for epsilon \n");
         }
         else if (LLParseTable[X.nt][a->plt->val] >= 0)
         {
             LinkedListPtr production = grammar[LLParseTable[X.nt][a->plt->val]];
             
-            printList(production);
+            // printList(production);
 
             ParseNodePtr top = pop(stack);
 
@@ -477,7 +483,7 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
             while (derivation != production->head)
             {
                 //printSYM(derivation->data);
-                ParseNodePtr newNode = createParseNode(derivation->data);
+                ParseNodePtr newNode = createParseNode(derivation->data, a->lineNo, (derivation->data.type == TERM ? a->plt->lexeme : NULL));
                 push(stack, newNode);
                 addChild(top, newNode);
                 derivation = derivation->prev;
@@ -486,26 +492,24 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
         }  
         else
         {
-            int j = 0;
-            printf("Line no %d: Invalid token %s encountered with value %s stack top %s\n", a->lineNo, tokenToString(a->plt->val), a->plt->lexeme, NTtoString(X.nt));
+            fprintf(efp, "Line no %d: Invalid token %s encountered with value %s stack top %s\n", a->lineNo, tokenToString(a->plt->val), a->plt->lexeme, NTtoString(X.nt));
             while(1) 
             {
-                j++;
-                printf("%s %s %d\n", NTtoString(X.nt), tokenToString(a->plt->val), synchSet[X.nt][a->plt->val]);
+                // printf("%s %s %d\n", NTtoString(X.nt), tokenToString(a->plt->val), synchSet[X.nt][a->plt->val]);
                 a = getNextToken();
                 if(synchSet[X.nt][a->plt->val])
                 {
                     pop(stack);
-                    printf("hello\n");
+                    // printf("hello\n");
                     break;
                 }
             } 
-            if(j == 10) break;
         }
-        printf("%d\n", isEmpty(stack));
+
+        if(isEmpty(stack)) break;
         X = peek(stack)->val;
     }
-
+    fclose(efp);
     return result;
 }
 
@@ -521,5 +525,6 @@ int main()
 
     computeFirstAndFollow();
     //printTokenSet(firstSet[stmts]);
-    parseInputSourceCode("final.txt");
+    ParseTreePtr pt = parseInputSourceCode("final.txt");
+    printParseTree(pt, "parseTreeOutput.txt");
 }

@@ -5,3 +5,4 @@
 
 void initGrammarRules();
 void computeFirstAndFollow();
+ParseTreePtr parseInputSourceCode(char *testCaseFileName);
