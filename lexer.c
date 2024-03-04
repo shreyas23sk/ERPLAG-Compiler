@@ -209,6 +209,11 @@ int isBlank(char c)
     return EQ(' ') || EQ('\t');
 }
 
+int isAtEndOfInput() 
+{
+    return feof(B->fp);
+}
+
 /// @brief Get the next token from the input
 tokenInfo getNextToken()
 {
@@ -230,10 +235,6 @@ tokenInfo getNextToken()
             continue;
         }
 
-        if(c == EOF) 
-        {
-            return NULL;
-        }
 
         MOVE_IF(0, 19, isSymbol(c));
 
@@ -318,14 +319,22 @@ tokenInfo getNextToken()
         return acceptState(TK_OR, B);
 
         CASE(15)
-        return acceptState(TK_AND, B);
+        {
+            retract(B);
+            return acceptState(TK_AND, B);
+        }
 
         CASE(49)
-        return acceptState(TK_EQ, B);
+        {
+            retract(B);
+            return acceptState(TK_EQ, B);
+        }
 
         CASE(12)
-        return acceptState(TK_NE, B);
-
+        {
+            retract(B);
+            return acceptState(TK_NE, B);
+        }
         CASE(9)
         return acceptState(TK_GE, B);
 
@@ -406,7 +415,7 @@ tokenInfo getNextToken()
         }
     }
 }
-
+/*
 int main()
 {
     removeComments("testcase.txt", "final.txt");
@@ -422,4 +431,4 @@ int main()
         printf("%d %s %s\n", test->lineNo, test->plt->lexeme, tokenToString(test->plt->val));
         j++;
     }
-}
+} */

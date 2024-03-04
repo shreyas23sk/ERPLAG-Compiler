@@ -15,15 +15,6 @@
 #define NO_OF_TERMS 57
 #define NO_OF_NONTERMS 55
 
-typedef struct
-{
-    token *set;
-    int eps;
-    int endOfInput;
-    int size;
-} TKSET;
-typedef TKSET *tokenSet;
-
 void printSYM(SYM s) 
 {
     if(s.type == TERM) printf("%s\n", tokenToString(s.tk));
@@ -401,7 +392,7 @@ void computeFirstAndFollow()
         /*
         if(grammar[i]->head->next->data.type == NONTERM && grammar[i]->head->next->data.nt == EPSILON) 
         {
-            //LLParseTable[nt][NO_OF_TERMS] = i;
+            LLParseTable[nt][NO_OF_TERMS] = i;
         } */
     }
 
@@ -410,6 +401,7 @@ void computeFirstAndFollow()
 
 ParseTreePtr parseInputSourceCode(char *testCaseFileName)
 {
+    removeComments("testcase.txt", testCaseFileName);
     initLexer(testCaseFileName);
 
     StackPtr stack = createStack();
@@ -428,7 +420,8 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
         {
             printf("found match at line no :- %d ", a->lineNo); printSYM(X);
             pop(stack);
-            a = getNextToken();
+            if(!isEmpty(stack)) a = getNextToken();
+            else break;
         }
         else if (X.type == NONTERM && X.nt == EPSILON)
         {
@@ -439,6 +432,7 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
         {
             printf("Encountered error during parsing - non matching tokens!\n");
             printSYM(X);
+            printList(grammar[LLParseTable[fieldDefinitions][TK_RUID]]);
             break;
         }
         else if (LLParseTable[X.nt][a->plt->val] >= 0)

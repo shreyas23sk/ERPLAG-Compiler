@@ -20,11 +20,6 @@ twinBuffer initBuffer(char *filename)
     B->fp = fopen(filename, "r");
     B->retractions = 0;
 
-    if (B->fp == NULL)
-    {
-        free(B);
-        return NULL;
-    }
 
     return B;
 }
@@ -56,7 +51,9 @@ twinBuffer advance(twinBuffer B)
     }
 
     if (B->retractions > 0)
+    {
         B->retractions--;
+    }
 
     return B;
 }
@@ -65,6 +62,7 @@ twinBuffer retract(twinBuffer B)
 {
     if (B->forward == B->buffer[B->forwardBufferNo])
     {
+        printf("hello\n");
         B->forwardBufferNo = !B->forwardBufferNo;
         B->forward = B->buffer[B->forwardBufferNo] + BUFLEN - 1;
     }
@@ -74,6 +72,7 @@ twinBuffer retract(twinBuffer B)
     }
 
     B->retractions++;
+
     return B;
 }
 
@@ -87,7 +86,6 @@ twinBuffer resetBegin(twinBuffer B)
     B->beginBufferNo = B->forwardBufferNo;
 
     retract(B);
-    B->retractions = 0;
 
     return B;
 }
@@ -116,8 +114,8 @@ char *getLexeme(twinBuffer B)
     }
     else
     {
-        int lexLength1 = B->buffer[B->beginBufferNo] + BUFLEN - 1 - B->begin;
-        int lexLength2 = B->forward - B->buffer[B->forwardBufferNo];
+        int lexLength1 = B->buffer[B->beginBufferNo] + BUFLEN - B->begin;
+        int lexLength2 = B->forward - B->buffer[B->forwardBufferNo] + 1;
 
         char *lexeme = (char *)malloc(sizeof(char) * (lexLength1 + lexLength2 + 1));
 
@@ -136,7 +134,7 @@ char *getLexeme(twinBuffer B)
         }
 
         lexeme[lexLength1 + lexLength2] = '\0';
-
+        printf("%d %d %s\n", lexLength1, lexLength2, lexeme);
         return lexeme;
     }
 }

@@ -5,4 +5,5 @@
 
 void initLexer(char *);
 tokenInfo getNextToken();
+int isAtEndOfInput();
 void removeComments(char *, char *);
