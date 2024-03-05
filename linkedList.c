@@ -1,4 +1,8 @@
+#ifndef PARSERDEF
+#define PARSERDEF
 #include "parserDef.h"
+#endif
+
 
 LinkedListPtr createLinkedList()
 {

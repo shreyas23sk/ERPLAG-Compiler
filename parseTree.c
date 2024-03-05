@@ -1,4 +1,7 @@
+#ifndef PARSERDEF
+#define PARSERDEF
 #include "parserDef.h"
+#endif
 
 ParseTreePtr createParseTree()
 {

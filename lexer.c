@@ -122,6 +122,7 @@ tokenInfo acceptState(token tk, twinBuffer B)
     char* lex = getLexeme(B);
     int lenCheck = (strlen(lex) <= 20);
     tokenInfo result;
+
     
     if(tk == TK_FIELDID || tk == TK_ID || tk == TK_RUID)
     {
@@ -133,6 +134,10 @@ tokenInfo acceptState(token tk, twinBuffer B)
         result = createTokenInfo(createPairLexemeToken(lex, tk), B);
     }
     resetBegin(B);
+    if(tk == TK_EOF)
+    {
+        fclose(B->fp);
+    }
     return result;
 }
 
@@ -141,7 +146,6 @@ void removeComments(char *inputFileName, char *outputFileName)
 {
     FILE *fp = fopen(inputFileName, "r");
     FILE *fp2 = fopen(outputFileName, "w");
-
     if (!fp || !fp2)
     {
         printf("Error opening file!\n");

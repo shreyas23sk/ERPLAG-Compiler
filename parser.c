@@ -3,12 +3,20 @@
 #include "parserDef.h"
 #endif
 
+#ifndef LEXERDEF
+#define LEXERDEF
+#include "lexerDef.h"
+#endif
+
+#ifndef LEXER
+#define LEXER
+#include "lexer.h"
+#endif
+
 #ifndef PARSER
 #define PARSER
 #include "parser.h"
 #endif
-
-#include "lexer.h"
 
 #define NO_OF_RULES 95
 #define MAX_SIZE_OF_TNT 26
@@ -416,16 +424,17 @@ void initSynchSet()
         synchSet[A][TK_ELSE] = SYNCH;
         synchSet[A][TK_SQR] = SYNCH;
         synchSet[A][TK_CL] = SYNCH;
+        synchSet[A][TK_END] = SYNCH;
+        synchSet[A][TK_ENDUNION] = SYNCH;
     }
 }
 
 ParseTreePtr parseInputSourceCode(char *testCaseFileName)
 {
-    removeComments("testcase.txt", testCaseFileName);
     initLexer(testCaseFileName);
     initSynchSet();
 
-    FILE* efp = fopen("errors.txt", "w+");
+    FILE* efp = stdout;
 
     StackPtr stack = createStack();
     push(stack, createParseNode(createSYM(NONTERM, "program"), 0, NULL));
@@ -435,21 +444,20 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
     // algorithm adapted from TB Ch4.4, pg 227
     tokenInfo a = getNextToken();
     SYM X = (peek(stack))->val;
-
+    
     while (!isEmpty(stack))
     {
         if(a->plt->val == TK_EOF) break;
-        
-        //printf("Current top element :- "); printSYM(X);
+
         if(a->plt->val == TK_ERROR)
         {
                 fprintf(efp, "Line No %d :- Unknown pattern %s\n", a->lineNo, a->plt->lexeme);
                 a = getNextToken();
-                // if(a->lineNo == 28) break;
+                continue;
         }
         if ((X.type == TERM))
         {
-            
+            int k = a->lineNo;
             if(X.tk == a->plt->val) 
             {
                 // printf("found match at line no :- %d ", a->lineNo); printSYM(X);
@@ -459,7 +467,8 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
             {
                 fprintf(efp, "Line no %d : The token %s for lexeme %s does not match the expected token %s\n", a->lineNo, tokenToString(a->plt->val), a->plt->lexeme, tokenToString(X.tk));
             }
-            pop(stack);
+            ParseNodePtr top = pop(stack);
+            top->lineNo = k;
         }
         else if (X.type == NONTERM && X.nt == EPSILON)
         {
@@ -521,33 +530,5 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
         if(isEmpty(stack)) break;
         X = peek(stack)->val;
     }
-    fclose(efp);
     return result;
-}
-
-int main()
-{
-    initGrammarRules();
-
-    /*
-    for(int i = 0; i < NO_OF_RULES; i++) {
-        printf("%d :- ", i);
-        printList(grammar[i]);
-    } */
-
-    computeFirstAndFollow();
-    //printTokenSet(firstSet[stmts]);
-    ParseTreePtr pt = parseInputSourceCode("final.txt");
-    printParseTree(pt, "parseTreeOutput.txt");
-    
-    /*
-    //removeComments("testcase.txt", "final.txt");
-    //initLexer("final.txt");
-
-    tokenInfo a = getNextToken();
-    while(a->plt->val != TK_EOF)
-    {
-        printf("Line no %-2d : Lexeme %-20s Token %-10s\n", a->lineNo, a->plt->lexeme, tokenToString(a->plt->val));
-        a = getNextToken();
-    } */
 }

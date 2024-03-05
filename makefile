@@ -4,7 +4,5 @@ lexerCompiler:
 	gcc -c stack.c 
 	gcc -c parseTree.c 
 	gcc -c parser.c 
-	gcc -o parser_exe stringNTConvert.o stringTokenConvert.o lexer.o lexerTwinBuffer.o lexerHashTable.o lexerPairLexemeToken.o lexerTokenInfo.o linkedList.o stack.o parseTree.o parser.o
-	./parser_exe
-	rm *o
-	rm *exe
+	gcc -c driver.c
+	gcc -o stage1exe stringNTConvert.o stringTokenConvert.o lexer.o lexerTwinBuffer.o lexerHashTable.o lexerPairLexemeToken.o lexerTokenInfo.o linkedList.o stack.o parseTree.o parser.o driver.o
