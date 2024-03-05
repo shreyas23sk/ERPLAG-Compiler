@@ -479,16 +479,29 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
                 result->root = top;
             }
 
+            int noOfNodes = 0;
             NodePtr derivation = production->tail;
             while (derivation != production->head)
             {
-                //printSYM(derivation->data);
                 ParseNodePtr newNode = createParseNode(derivation->data, a->lineNo, (derivation->data.type == TERM ? a->plt->lexeme : NULL));
                 push(stack, newNode);
-                addChild(top, newNode);
                 derivation = derivation->prev;
+
+                noOfNodes++;
+            }
+
+            StackPtr tempStack = createStack();
+            for(int i = 0; i < noOfNodes; i++)
+            {
+                NodePtr n1 = pop(stack);
+                push(tempStack, n1);
+                addChild(top, n1);
             }
             
+            while(!isEmpty(tempStack))
+            {
+                push(stack, pop(tempStack));
+            }
         }  
         else
         {
