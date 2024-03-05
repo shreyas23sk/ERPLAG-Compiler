@@ -45,7 +45,6 @@ typedef enum
     termPrime,
     var,
     booleanExpression,
-    not,
     singleOrRecId,
     logicalOp,
     relationalOp,

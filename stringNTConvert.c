@@ -140,9 +140,6 @@ NT stringToNT(char *str)
     else if (!strcmp(str, "booleanExpression"))
         return booleanExpression;
 
-    else if (!strcmp(str, "not"))
-        return not ;
-
     else if (!strcmp(str, "singleOrRecId"))
         return singleOrRecId;
 
@@ -312,9 +309,6 @@ const char *NTtoString(NT nt)
 
     case booleanExpression:
         return "booleanExpression";
-
-    case not:
-        return "not";
 
     case singleOrRecId:
         return "singleOrRecId";

@@ -13,7 +13,7 @@
 #define NO_OF_RULES 95
 #define MAX_SIZE_OF_TNT 26
 #define NO_OF_TERMS 57
-#define NO_OF_NONTERMS 55
+#define NO_OF_NONTERMS 54
 #define SYNCH 1
 
 void printSYM(SYM s) 
