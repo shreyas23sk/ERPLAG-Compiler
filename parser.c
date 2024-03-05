@@ -160,7 +160,8 @@ void initGrammarRules()
                 j = 0;
             }
         }
-        else if (c == '\r')
+        else if(c == '\r') continue;
+        else if (c == '\n')
         {
             if (tnt[0] != '\0') // current string is not empty
             {
@@ -374,7 +375,6 @@ void computeFirstAndFollow()
         followSet[i]->endOfInput = (i == program);
         followSet[i]->size = 0;
     }
-
     // computeFirst
     computeFirst();
     computeFollow();

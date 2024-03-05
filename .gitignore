@@ -8,7 +8,6 @@ Code/testcases/
 
 # Ignore specific file types
 *.out
-*.pdf
 *.o
 main
 
