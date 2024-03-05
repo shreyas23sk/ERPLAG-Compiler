@@ -457,7 +457,6 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
 
         if(a->plt->val == TK_ERROR)
         {
-                fprintf(efp, "Line No %d :- Unknown pattern %s\n", a->lineNo, a->plt->lexeme);
                 a = getNextToken();
                 continue;
         }

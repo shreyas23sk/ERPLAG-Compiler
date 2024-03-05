@@ -132,9 +132,17 @@ tokenInfo acceptState(token tk, twinBuffer B)
     
     if(tk == TK_FIELDID || tk == TK_ID || tk == TK_RUID)
     {
-        if(!lenCheck) result = createTokenInfo(createPairLexemeToken(lex, TK_ERROR), B);
+        if(!lenCheck) {
+            printf("Line no %d :- Variable identifier %s exceeds maximum limit of 20 characters\n", B->lineNo, lex);
+            result = createTokenInfo(createPairLexemeToken(lex, TK_ERROR), B);
+        }
         else result = createTokenInfo(createPairLexemeToken(lex, tk), B);
     } 
+    else if (tk == TK_ERROR)
+    {
+        printf("Line no %d :- Unknown pattern <%s>\n", B->lineNo, lex);
+        result = createTokenInfo(createPairLexemeToken(lex, tk), B);
+    }
     else 
     {
         result = createTokenInfo(createPairLexemeToken(lex, tk), B);
