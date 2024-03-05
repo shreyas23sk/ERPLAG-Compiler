@@ -45,6 +45,7 @@ int main(int argc, char* argv[])
         }
         else if (in == 2)
         {
+            removeComments(testCaseFileName, "final.txt");
             initLexer("final.txt");
             tokenInfo a = getNextToken();
             while(a->plt->val != TK_EOF)
