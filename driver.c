@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     int in = 1;
     char* testCaseFileName = argv[1];
     char* parseTreeOutputFileName = argv[2];
-    printf("arg file name %s\n", testCaseFileName);
+
     while(in) 
     {
         printf("Enter\n 0 : exit\n 1: remove comments from test case\n 2: run only the lexer and get the tokens on console\n 3: run the lexer and parser to get parse tre on output file\n 4: get the running time of lexer and parser\n");
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
             tokenInfo a = getNextToken();
             while(a->plt->val != TK_EOF)
             {
-                printf("Line no %d :- Lexeme %-20s Token %-15s\n", a->lineNo, a->plt->lexeme, tokenToString(a->plt->val));
+                if(a->plt->val != TK_ERROR) printf("Line no %d :- Lexeme %-20s Token %-15s\n", a->lineNo, a->plt->lexeme, tokenToString(a->plt->val));
                 a = getNextToken();
             }
         }
