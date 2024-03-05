@@ -523,16 +523,17 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
             {
                 // printf("%s %s %d\n", NTtoString(X.nt), tokenToString(a->plt->val), synchSet[X.nt][a->plt->val]);
                 a = getNextToken();
+                if(a->plt->val == TK_EOF) break;
                 if(synchSet[X.nt][a->plt->val])
                 {
-                    pop(stack);
+                    if (!isEmpty(stack)) pop(stack);
                     // printf("hello\n");
                     break;
                 }
             } 
         }
 
-        if(isEmpty(stack)) break;
+        if(isEmpty(stack) || a->plt->val == TK_EOF) break;
         X = peek(stack)->val;
     }
     return result;
