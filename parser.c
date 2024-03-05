@@ -10,7 +10,7 @@
 
 #include "lexer.h"
 
-#define NO_OF_RULES 96
+#define NO_OF_RULES 95
 #define MAX_SIZE_OF_TNT 26
 #define NO_OF_TERMS 57
 #define NO_OF_NONTERMS 55
@@ -280,7 +280,6 @@ void computeFirst()
     {
         j++;
         deepCopy(firstSetOld, firstSet);
-        printf("%d\n", j);
         for (int i = 0; i < NO_OF_RULES; i++)
         {   
             LinkedListPtr pi = grammar[i];
@@ -493,7 +492,7 @@ ParseTreePtr parseInputSourceCode(char *testCaseFileName)
             StackPtr tempStack = createStack();
             for(int i = 0; i < noOfNodes; i++)
             {
-                NodePtr n1 = pop(stack);
+                ParseNodePtr n1 = pop(stack);
                 push(tempStack, n1);
                 addChild(top, n1);
             }
@@ -540,4 +539,15 @@ int main()
     //printTokenSet(firstSet[stmts]);
     ParseTreePtr pt = parseInputSourceCode("final.txt");
     printParseTree(pt, "parseTreeOutput.txt");
+    
+    /*
+    //removeComments("testcase.txt", "final.txt");
+    //initLexer("final.txt");
+
+    tokenInfo a = getNextToken();
+    while(a->plt->val != TK_EOF)
+    {
+        printf("Line no %-2d : Lexeme %-20s Token %-10s\n", a->lineNo, a->plt->lexeme, tokenToString(a->plt->val));
+        a = getNextToken();
+    } */
 }

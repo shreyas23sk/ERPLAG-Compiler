@@ -117,7 +117,7 @@ void printParseTree(ParseTreePtr tree, char* outFile)
     FILE* fp = fopen(outFile, "w+");
     if(fp == NULL) printf("Error opening file\n");
     int k = fprintf(fp, "%-30s %-30s %-30s %-30s %-30s %-30s %-30s\n", "lexeme", "lineno", "tokenName", "valueIfNumber", "parentNodeSymbol", "isLeafNode", "NodeSymbol");
-    printf("%d\n", k);
+    // printf("%d\n", k);
     printParseTreeHelper(tree->root, NULL, fp);
     fclose(fp);
 }

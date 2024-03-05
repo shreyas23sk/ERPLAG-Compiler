@@ -132,7 +132,6 @@ tokenInfo acceptState(token tk, twinBuffer B)
     {
         result = createTokenInfo(createPairLexemeToken(lex, tk), B);
     }
-    printf("Line no %d :- Token returned :- %s %s\n", B->lineNo, lex, tokenToString(tk));
     resetBegin(B);
     return result;
 }

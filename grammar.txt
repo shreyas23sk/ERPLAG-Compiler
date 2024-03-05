@@ -41,10 +41,9 @@ termPrime highPrecdenceOperator factor termPrime | EPSILON
 factor TK_OP arithmeticExpression TK_CL | var
 highPrecdenceOperator TK_MUL | TK_DIV
 lowPrecedenceOperator TK_PLUS | TK_MINUS
-booleanExpression not TK_OP booleanExpression TK_CL
 booleanExpression TK_OP booleanExpression TK_CL logicalOp TK_OP booleanExpression TK_CL
+booleanExpression TK_NOT TK_OP booleanExpression TK_CL
 booleanExpression  var  relationalOp  var 
-not TK_NOT | EPSILON
 var singleOrRecId | TK_NUM | TK_RNUM
 logicalOp TK_AND | TK_OR
 relationalOp TK_LT | TK_LE | TK_EQ |TK_GT | TK_GE | TK_NE
